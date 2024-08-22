@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/ui/ModeToggle";
+import { AuthProvider } from "@/context/AuthContext";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +24,10 @@ export default function RootLayout({
       <nav>
         <ul className="flex space-x-4">
           <li>
-            <a href="/login">Login</a>
+            <Link href="/login">Login</Link>
           </li>
           <li>
-            <a href="/dashboard">Dashboard</a>
+            <Link href="/dashboard">Dashboard</Link>
           </li>
         </ul>
       </nav>
@@ -41,6 +43,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <AuthProvider>
       <body className={ 'w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
         <ThemeProvider attribute="class"
             defaultTheme="system"
@@ -51,6 +54,7 @@ export default function RootLayout({
         {footer}
         </ThemeProvider>
       </body>
+      </AuthProvider>
     </html>
   );
 }
