@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const header = (
-    <header className="flex justify-between items-center p-4 sm:p-8 gap-4">
-      <h1 className="text-2xl font-bold">ScheduMe</h1>
+    <header className="flex justify-between items-center p-4 sm:p-8 gap-4 backdrop-blur-md sticky top-0 z-50">
+      <h1 className="text-2xl font-bold"><a href="./">ScheduMe</a></h1>
       <nav>
         <ul className="flex space-x-4">
           <li>
@@ -39,10 +41,15 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={ 'w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen flex flex-col h-screen justify-between' + inter.className}>
+      <body className={ 'w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
+        <ThemeProvider attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange>
         {header}
         {children}
         {footer}
+        </ThemeProvider>
       </body>
     </html>
   );
