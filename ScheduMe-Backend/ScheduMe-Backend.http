@@ -1,0 +1,6 @@
+@ScheduMe_Backend_HostAddress = http://localhost:5183
+
+GET {{ScheduMe_Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
