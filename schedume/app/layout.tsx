@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { AuthProvider } from "@/context/AuthContext";
 import Link from "next/link";
+import { Toaster } from "@/components/ui/toaster";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,6 +54,7 @@ export default function RootLayout({
         {header}
         {children}
         {footer}
+        <Toaster/>
         </ThemeProvider>
       </body>
       </AuthProvider>

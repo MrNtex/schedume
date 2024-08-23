@@ -14,7 +14,16 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined)
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  userDataObj: {},
+  signup: async () => {},
+  login: async () => {},
+  logout: async () => {},
+  loading: false,
+};
+
+const AuthContext = React.createContext(defaultAuthContext)
 
 export function useAuth() {
   return useContext(AuthContext)
