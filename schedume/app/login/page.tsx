@@ -1,6 +1,7 @@
 import Dashboard from '@/components/Dashboard'
 import Login from '@/components/Login'
-import { Main } from 'next/document'
+import { Input } from '@/components/ui/input';
+import Main from "@/components/Main";
 import React from 'react'
 
 export const metadata = {
@@ -18,8 +19,8 @@ export default function page() {
   )
 
   return (
-    <div>
-      {children}
-    </div>
+    <Main>
+      <Login/>
+    </Main>
   )
 }
