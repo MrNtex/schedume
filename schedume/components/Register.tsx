@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ import {
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { HoverBorderGradient } from "./ui/hover-border-gradient";
+import { useToast } from "./ui/use-toast";
 
 export default function Signup() {
 
@@ -19,8 +20,33 @@ export default function Signup() {
         router.push('./login');
     };
 
+    const [authenticating, setAuthenticating] = useState(false)
+
+    const [email, setEmail] = useState('')
+    const [password, setPassword]= useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+
+    const { toast } = useToast()
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (email === '' || password === '' || confirmPassword === '' || firstName === '') { // Last name is optional
+        toast({
+            title: "Uh oh! Something went wrong.",
+            description: "Please fill in all fields.",})
+        return
+    }
+
+    if (password !== confirmPassword) {
+        toast({
+            title: "Uh oh! Something went wrong.",
+            description: "Passwords do not match.",})
+        return
+    }
+
     console.log("Form submitted");
   };
   return (
@@ -36,27 +62,28 @@ export default function Signup() {
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
             <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder="Artur" type="text" />
+            <Input id="firstname" placeholder="Artur" type="text" onChange={(e) => setFirstName(e.target.value)}/>
           </LabelInputContainer>
           <LabelInputContainer>
             <Label htmlFor="lastname">Last name</Label>
-            <Input id="lastname" placeholder="Niemiec" type="text" />
+            <Input id="lastname" placeholder="Niemiec" type="text" onChange={(e) => setLastName(e.target.value)}/>
           </LabelInputContainer>
         </div>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
+          <Input id="email" placeholder="projectmayhem@fc.com" type="email" onChange={(e) => setEmail(e.target.value)}/>
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" />
+          <Input id="password" placeholder="••••••••" type="password"  onChange={(e) => setPassword(e.target.value)} />
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
           <Label htmlFor="password">Confirm Password</Label>
           <Input
-            id="twitterpassword"
+            id="confirmPassword"
             placeholder="••••••••"
-            type="twitterpassword"
+            type="password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </LabelInputContainer>
 
