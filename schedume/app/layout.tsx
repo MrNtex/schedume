@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AuthProvider>
-      <body className={ 'flex flex-col w-full max-w-[1000px] mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
+      <body className={ 'flex flex-col w-full mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
         <ThemeProvider attribute="class"
             defaultTheme="system"
             enableSystem

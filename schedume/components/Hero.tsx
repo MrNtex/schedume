@@ -6,15 +6,39 @@ import Link from 'next/link'
 import { ShootingStars } from './ui/shooting-stars'
 import { StarsBackground } from './ui/stars-background'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext';
 
 export default function Hero() {
 
+  const { user } = useAuth()
+
   const router = useRouter();
 
-  const registerClick = () => {
-    router.push('/signup');
+  const registerClick = (dest: string) => {
+    router.push(dest);
   }
 
+  const MainButton = () => {
+    if (user) {
+      return (
+        <button className="p-[3px] relative" onClick={() => registerClick('./dashboard')}>
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+          <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+            Go to Dashboard
+          </div>
+        </button>
+      )
+    }
+    return (
+      <button className="p-[3px] relative" onClick={() => registerClick('./signup')}>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+        <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
+          Try Shedume Now
+        </div>
+      </button>
+    )
+  }
+  
   return (
     
     <div className='flex flex-col items-center justify-center h-full '>
@@ -29,12 +53,7 @@ export default function Hero() {
       </p>
 
       </div>
-      <button className="p-[3px] relative" onClick={registerClick}>
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
-        <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
-          Try Shedume Now
-        </div>
-      </button>
+      <MainButton />
     </div>
     
   )

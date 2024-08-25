@@ -58,6 +58,11 @@ export default function Login() {
             title: "Uh oh! Something went wrong.",
             description: "Wrong password.",})
           break
+        case 'auth/invalid-credential':
+          toast({
+            title: "Uh oh! Something went wrong.",
+            description: "Invalid credential.",})
+          break
         default:
           toast({
             title: "Uh oh! Something went wrong.",

@@ -28,8 +28,8 @@ export default function DayCalendar() {
   };
 
   return (
-    <div className="relative">
-      <div className="grid grid-cols-1 border-gray-300">
+    <div className="relative flex justify-center items-center">
+      <div className="grid grid-cols-1 border-gray-300 max-w-[60%] mx-auto">
         {hours.map((hour) => (
           <div
             key={hour}
@@ -50,7 +50,6 @@ export default function DayCalendar() {
           </div>
         ))}
       </div>
-
       {/* Current Time Line */}
       {currentTime && (
         <div
