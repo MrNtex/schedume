@@ -1,36 +1,34 @@
 "use client"
 
 import Dashboard from '@/components/Dashboard'
+import DayCalendar from '@/components/DayCalendar'
 import Login from '@/components/Login'
+import { useAuth } from '@/context/AuthContext'
 import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 
 
 
 export default function page() {
-  const [message, setMessage] = useState('');
+  
+  const { user, userDataObj } = useAuth()
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch('http://localhost:5183/api/example');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setMessage(data.message);
-      } catch (error) {
-        console.error('There was a problem with the fetch operation:', error);
-      }
-    }
+  if (!user) {
+    return (
+      <div> No user </div>
+    )
+  }
 
-    fetchData();
-  }, []);
+  if(!userDataObj) {
+    return (
+      <div> No user data </div>
+    )
+  }
+
 
   return (
     <div>
-      <h1>Message from .NET API:</h1>
-      <p>{message}</p>
+      <DayCalendar/>
     </div>
   );
 }
