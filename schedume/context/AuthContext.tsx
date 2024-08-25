@@ -2,13 +2,13 @@
 
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect} from 'react'
 
 interface AuthContextType {
   user: User | null;
   userDataObj: any;
-  signup: (email: string, password: string) => Promise<any>;
+  signup: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   loading: boolean;
@@ -37,8 +37,23 @@ export function AuthProvider(props: { children: any }) {
 
 
   // AUTH HAN
-  function signup(email: string, password: string) {
+  function signup(email: string, password: string, firstName: string, lastName: string) {
     return createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user
+      const docRef = doc(db, 'users', user.uid)
+      return setDoc(docRef, {
+        email,
+        firstName,
+        lastName,
+        uid: user.uid
+      })
+    })
+    .catch((error) => {
+      const errorCode = error.code
+      const errorMessage = error.message
+      console.log(errorCode, errorMessage)
+    })
   }
 
   function login(email: string, password: string) {

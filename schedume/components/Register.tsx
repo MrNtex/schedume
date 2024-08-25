@@ -12,11 +12,15 @@ import { useRouter } from "next/navigation";
 import { HoverBorderGradient } from "./ui/hover-border-gradient";
 import { useToast } from "./ui/use-toast";
 
+import { useAuth } from "../context/AuthContext";
+import UserHeader from "./UserHeader";
+
 export default function Signup() {
 
     const router = useRouter();
 
-    const handleRedirect = () => {
+    const handleRedirect = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         router.push('./login');
     };
 
@@ -30,6 +34,8 @@ export default function Signup() {
 
     const { toast } = useToast()
 
+    const { signup } = useAuth()
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -40,15 +46,45 @@ export default function Signup() {
         return
     }
 
+    if (password.length < 6) {
+        toast({
+            title: "Uh oh! Something went wrong.",
+            description: "Password must be at least 6 characters long.",})
+        return
+    }
+
     if (password !== confirmPassword) {
         toast({
             title: "Uh oh! Something went wrong.",
             description: "Passwords do not match.",})
         return
     }
-
-    console.log("Form submitted");
+    handleSignUp()
   };
+
+  async function handleSignUp() {
+    setAuthenticating(true)
+    // Call API to create user
+    try {
+      await signup (email, password, firstName, lastName)
+    }
+    catch (error: any) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          toast({
+            title: "Uh oh! Something went wrong.",
+            description: "Email already in use.",})
+          break
+        default:
+          toast({
+            title: "Uh oh! Something went wrong.",
+            description: "An error occurred.",})
+      }
+    }
+    finally {
+      setAuthenticating(false)
+    }
+  }
   return (
     <div className="max-w-lg w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
       <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
@@ -71,7 +107,7 @@ export default function Signup() {
         </div>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="projectmayhem@fc.com" type="email" onChange={(e) => setEmail(e.target.value)}/>
+          <Input id="email" placeholder="e36artur@example.com" type="email" onChange={(e) => setEmail(e.target.value)}/>
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>

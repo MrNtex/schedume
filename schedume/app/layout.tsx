@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/ui/ModeToggle";
 import { AuthProvider } from "@/context/AuthContext";
 import Link from "next/link";
 import { Toaster } from "@/components/ui/toaster";
+import UserHeader from "@/components/UserHeader";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,14 +25,7 @@ export default function RootLayout({
     <header className="flex justify-between items-center p-4 sm:p-8 gap-4 backdrop-blur-md sticky top-0 z-50">
       <h1 className="text-2xl font-bold"><a href="./">ScheduMe</a></h1>
       <nav>
-        <ul className="flex space-x-4">
-          <li>
-            <Link href="/login">Login</Link>
-          </li>
-          <li>
-            <Link href="/dashboard">Dashboard</Link>
-          </li>
-        </ul>
+        <UserHeader />
       </nav>
     </header>
   );
