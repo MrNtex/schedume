@@ -1,9 +1,12 @@
 "use client"
 
 import Dashboard from '@/components/Dashboard'
+import { DashboardFloatingDock } from '@/components/DashboardFloatingDock'
 import DayCalendar from '@/components/DayCalendar'
 import Login from '@/components/Login'
+import { FloatingDock } from '@/components/ui/floating-dock'
 import { useAuth } from '@/context/AuthContext'
+import { ScheduleProvider } from '@/context/ScheduleContext'
 import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 
@@ -27,8 +30,10 @@ export default function page() {
 
 
   return (
-    <div>
+    <ScheduleProvider>
+      
       <DayCalendar/>
-    </div>
+      <DashboardFloatingDock/>
+    </ScheduleProvider>
   );
 }

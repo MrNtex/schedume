@@ -27,42 +27,34 @@ export default function DayCalendar() {
     }
   };
 
+  const Hour = ({ hour }: { hour: string }) => {
+    return <div className="py-3 pb-10 px-5 flex items-center text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-white dark:before:border-neutral-600 dark:after:border-neutral-600">{hour}</div>
+  }
+
   return (
-    <div className="relative flex justify-center items-center">
-      <div className="grid grid-cols-1 border-gray-300 max-w-[60%] mx-auto">
-        {hours.map((hour) => (
+    <div className='relative flex justify-center items-center'>
+      <div className="w-[60%]">
+        {/* Current Time Line */}
+        {currentTime && (
           <div
-            key={hour}
-            className="relative border-t border-gray-300 h-16 cursor-pointer"
-            onClick={() => addEvent(hour)}
+            className="absolute left-0 right-0 h-0.5 bg-red-500 w-[70%] mx-auto"
+            style={{
+              top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / 1440 * 100}%`,
+            }}
           >
-            <div className="absolute -left-12 top-2 text-gray-500">{hour}</div>
-            {events
-              .filter((event) => event.hour === hour)
-              .map((event, index) => (
-                <div
-                  key={index}
-                  className="absolute left-0 top-2 bg-blue-200 p-2 rounded text-sm"
-                >
-                  {event.title}
-                </div>
-              ))}
+            <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
+              {currentTime}
+            </span>
           </div>
-        ))}
-      </div>
-      {/* Current Time Line */}
-      {currentTime && (
-        <div
-          className="absolute left-0 right-0 h-0.5 bg-red-500"
-          style={{
-            top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / 1440 * 100}%`,
-          }}
-        >
-          <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
-            {currentTime}
-          </span>
+        )}
+        <div className="grid grid-cols-1 border-gray-300 mx-auto">
+          {hours.map((hour) => (
+            <Hour hour={hour}/>
+          ))}
         </div>
-      )}
+        
+      </div>
     </div>
+    
   );
 }
