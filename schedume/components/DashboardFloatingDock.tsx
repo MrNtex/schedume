@@ -59,7 +59,7 @@ export function DashboardFloatingDock() {
   ];
   return (
     <div className="sticky bottom-0">
-  <div className="flex items-center justify-center h-12 pb-16 w-full">
+  <div className="flex items-center justify-center h-12 py-16 w-full">
     <FloatingDock
       mobileClassName="translate-y-20" // only for demo, remove for production
       items={links}
