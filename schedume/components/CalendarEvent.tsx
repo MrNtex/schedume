@@ -1,9 +1,10 @@
+import { EventType } from '@/context/ScheduleContext'
 import React from 'react'
 
-export default function CalendarEvent({eventId}: {eventId:number}) {
+export default function CalendarEvent({event}: {event:EventType}) {
   return (
-    <div key={eventId} className='bg-emerald-500 rounded-xl px-5 top-2' style={{
-      top: `${1300 / (24 * 60) * 100}%`,
+    <div className='absolute bg-emerald-500 rounded-xl px-5 w-[40%]' style={{
+      top: `${event.hour * 60 / (24 * 60) * 100}%`,
 
     }}>
         <h1 className='text-white text-3xl font-bold p-4'>Event</h1>

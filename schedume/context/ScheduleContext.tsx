@@ -5,9 +5,10 @@ import { useContext } from "react";
 import { useAuth } from "./AuthContext";
 import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
+import { create } from "domain";
 
 
-interface EventType {
+export interface EventType {
     id?: number;
     title: string;
     description: string;
@@ -21,6 +22,12 @@ interface ScheduleContextType {
 
     addEvent: (event: EventType) => Promise<void>;
     removeEvent: (id: number) => Promise<void>;
+
+    createEvent: (hour: string) => void;
+    setCreatingEvent: (value: boolean) => void;
+    creatingEvent: boolean;
+
+    newEventData?: EventType;
 }
 
 const ScheduleContext = React.createContext<ScheduleContextType>({
@@ -30,16 +37,26 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
 
     addEvent: async () => {},
     removeEvent: async () => {},
+    
+    createEvent: () => {},
+    setCreatingEvent: () => {},
+    creatingEvent: false,
+
+    newEventData: undefined,
 })
 
 export function useSchedule() {
   return useContext(ScheduleContext)
 }
 
+
 export function ScheduleProvider(props: { children: any }) {
     const { user } = useAuth()
     const [events, setEvents] = React.useState<EventType[]>([])
     const [loading, setLoading] = React.useState(true)
+    const [creatingEvent, setCreatingEvent] = React.useState(false)
+    const [newEventData, setNewEventData] = React.useState<EventType>()
+
 
     useEffect(() => {
         if (!user) {
@@ -78,6 +95,19 @@ export function ScheduleProvider(props: { children: any }) {
 
     }
 
+    function CreateEvent(hour: string) {
+        console.log('add event at', hour);
+        setCreatingEvent(true)
+    
+        setNewEventData({
+            title: '',
+            description: '',
+            hour: parseInt(hour.split(':')[0])
+        })
+
+        console.log(creatingEvent)
+    }
+
     const removeEvent = async (id: number) => {
         if (!user) {
             throw new Error('User not logged in')
@@ -95,6 +125,12 @@ export function ScheduleProvider(props: { children: any }) {
 
         addEvent: async () => {},
         removeEvent: async () => {},
+
+        createEvent: CreateEvent,
+        creatingEvent: creatingEvent,
+        setCreatingEvent: setCreatingEvent,
+
+        newEventData: newEventData,
     }
 
     return (
