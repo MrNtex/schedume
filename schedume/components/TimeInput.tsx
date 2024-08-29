@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { EventType } from '@/context/ScheduleContext';
 import { Button } from './ui/button';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
-export default function TimeInput({ event }: { event?: EventType }) 
+interface TimeInputProps {
+    event?: EventType;
+    onHourChange: (hour: string) => void;
+    onMinuteChange: (minute: string) => void;
+  }
+  
+
+export default function TimeInput({
+    event,
+    onHourChange,
+    onMinuteChange,
+}: TimeInputProps) 
 { // Update the type of the event parameter
   let defaultHour = '';
   if(event) defaultHour = event.hour < 10 ? `0${event.hour}` : event.hour.toString();
   const [hour, setHour] = useState(defaultHour);
   const [minute, setMinute] = useState('');
 
+
+  useEffect(() => {
+    onHourChange(hour);
+    }, [hour]);
+
+    useEffect(() => {
+    onMinuteChange(minute);
+    }
+    , [minute]);
   const handleHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
 

@@ -13,6 +13,9 @@ export interface EventType {
     title: string;
     description: string;
     hour: number;
+    minute: number;
+
+    duration: number; // Duration in minutes
 }
 
 interface ScheduleContextType {
@@ -63,7 +66,7 @@ export function ScheduleProvider(props: { children: any }) {
             setEvents([]) // Clear events if user is not logged in
             return
         }
-
+        
         setLoading(true)
         const fetchEvents = async () => {
             // Fetch events from the server
@@ -79,6 +82,8 @@ export function ScheduleProvider(props: { children: any }) {
                 setLoading(false)
             }
         }
+
+        fetchEvents();
 
 
     }, [user])
@@ -102,7 +107,9 @@ export function ScheduleProvider(props: { children: any }) {
         setNewEventData({
             title: '',
             description: '',
-            hour: parseInt(hour.split(':')[0])
+            hour: parseInt(hour.split(':')[0]),
+            minute: parseInt(hour.split(':')[1]),
+            duration: 60,
         })
 
         console.log(creatingEvent)
@@ -123,7 +130,7 @@ export function ScheduleProvider(props: { children: any }) {
         events: events,
         loading: false,
 
-        addEvent: async () => {},
+        addEvent: addEvent,
         removeEvent: async () => {},
 
         createEvent: CreateEvent,
