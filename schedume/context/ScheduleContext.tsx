@@ -3,13 +3,13 @@
 import React, { useEffect } from "react";
 import { useContext } from "react";
 import { useAuth } from "./AuthContext";
-import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { create } from "domain";
 
 
 export interface EventType {
-    id?: number;
+    id: string;
     title: string;
     description: string;
     hour: number;
@@ -30,6 +30,8 @@ interface ScheduleContextType {
     setCreatingEvent: (value: boolean) => void;
     creatingEvent: boolean;
 
+    UpdateEvent: (event: EventType) => Promise<void>;
+
     newEventData?: EventType;
 }
 
@@ -44,6 +46,8 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
     createEvent: () => {},
     setCreatingEvent: () => {},
     creatingEvent: false,
+
+    UpdateEvent: async () => {},
 
     newEventData: undefined,
 })
@@ -60,7 +64,28 @@ export function ScheduleProvider(props: { children: any }) {
     const [creatingEvent, setCreatingEvent] = React.useState(false)
     const [newEventData, setNewEventData] = React.useState<EventType>()
 
+    function isFiniteNumber(value: any): boolean {
+        // Check if the value is a finite number
+        return typeof value === 'number' && Number.isFinite(value);
+      }
 
+    function ValidateEvent(event: EventType) {
+        if(!event.title || event.title.length === 0) {
+            event.title = 'Untitled Event'
+        }
+        if(!event.description) {
+            event.description = ''
+        }
+        if(!isFiniteNumber(event.hour)) {
+            event.hour = 0
+        }
+        if(!isFiniteNumber(event.minute)) {
+            event.minute = 0
+        }
+        if(!isFiniteNumber(event.duration)) {
+            event.duration = 60
+        }
+    }
     useEffect(() => {
         if (!user) {
             setEvents([]) // Clear events if user is not logged in
@@ -95,9 +120,35 @@ export function ScheduleProvider(props: { children: any }) {
             return
         }
 
-        const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
-        setEvents(prevEvents => [...prevEvents, { id: Number(docRef.id), ...event }])
+        ValidateEvent(event)
 
+        const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
+        setEvents(prevEvents => [...prevEvents, { ...event, id: docRef.id }])
+
+        console.log('Event added:', event)
+    }
+    
+    const UpdateEvent = async (event: EventType) => {
+        if(event.id === undefined) { throw new Error('Event id is undefined') }
+        if (!user) {
+            throw new Error('User not logged in')
+            return
+        }
+    
+        try {
+            const eventDocRef = doc(db, 'users', user.uid, 'events', event.id.toString())
+    
+            await updateDoc(eventDocRef, {
+                ...event
+            })
+    
+            setEvents(prevEvents =>
+                prevEvents.map(ev => (ev.id === event.id ? { ...ev, ...event } : ev))
+            );
+            console.log('Event updated:', event)
+        } catch (error) {
+            console.error('Error updating event:', error)
+        }
     }
 
     function CreateEvent(hour: string) {
@@ -136,6 +187,8 @@ export function ScheduleProvider(props: { children: any }) {
         createEvent: CreateEvent,
         creatingEvent: creatingEvent,
         setCreatingEvent: setCreatingEvent,
+
+        UpdateEvent: UpdateEvent,
 
         newEventData: newEventData,
     }
