@@ -70,18 +70,37 @@ export default function CalendarEvent({ event }: { event: EventType }) {
   
     // Calculate the mouse position relative to the parent during resize
     const relativeY = e.clientY - parentRect.top;
+
     let resizePercent = (relativeY / parentHeight) * 100;
-  
+    
     // Adjust based on initial size and resize type
     resizePercent = Math.max(0, Math.min(100, Math.floor(resizePercent / step) * step)); // Keep within bounds and snap to steps
-
     // Calculate the new duration based on resize
-    const newDuration = (position - resizePercent) / 100 * 24 * 60;
-
-    setResizeHeight(event.duration / (24 * 60) * 100 + newDuration / (24 * 60) * 100);
     
 
-    setResizePosition(resizePercent);
+    if(resizeType === 'top') 
+    {
+      let newDuration = (position - resizePercent) / 100 * 24 * 60;
+      newDuration += event.duration;
+
+      console.log(newDuration);
+
+      if(newDuration < 14) // 14 because of floating point errors
+      { // Minimum duration of 15 minutes
+        return;
+      }
+      setResizePosition(resizePercent);
+      setResizeHeight(Math.abs(newDuration / (24 * 60) * 100));
+    }
+    else{ // for bottom we don't need to calculate the new position
+      const newDuration = (resizePercent - position) / 100 * 24 * 60;
+      console.log(newDuration);
+      if(newDuration < 14)
+      { // Minimum duration of 15 minutes
+        return;
+      }
+      setResizeHeight(newDuration / (24 * 60) * 100);
+    }
   };
 
   // Handle resize stop
@@ -135,6 +154,14 @@ export default function CalendarEvent({ event }: { event: EventType }) {
             {event.hour}:{event.minute ? event.minute : '00'}
           </h1>
         </div>
+
+        <DraggableCore
+          onStart={(e, data) => handleStartResize('bottom', e, data)}
+          onDrag={(e, data) => handleResize('bottom',e, data)}
+          onStop={handleResizeStop}
+        >
+          <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize bg-cyan-700"></div>
+        </DraggableCore>
       </div>
     </DraggableCore>
   );
