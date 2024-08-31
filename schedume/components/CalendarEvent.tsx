@@ -3,20 +3,20 @@ import React, { useState, useRef } from 'react';
 import { DraggableCore, DraggableData } from 'react-draggable';
 
 export default function CalendarEvent({ event }: { event: EventType }) {
-  const [position, setPosition] = useState(-1);
+  const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [resizePosition, setResizePosition] = useState(0);
   const [resizeHeight, setResizeHeight] = useState(0);
   const eventRef = useRef<HTMLDivElement>(null); // Reference to the draggable element
 
   const { UpdateEvent } = useSchedule();
 
-  let calculatedHours = 0;
-  let calculatedMinutes = 0;
+  const [calculatedHours, setCalculatedHours] = useState(event.hour);
+  const [calculatedMinutes, setCalculatedMinutes] = useState(event.minute);
 
-  let startHeight = event.duration / (24 * 60) * 100;
-  let startY = 0;
+  const [calculatedDuration, setCalculatedDuration] = useState(event.duration);
+
+  const [startY, setStartY] = useState(0);
 
   const step = 100 / 24 / 4; // step every 15 minutes
 
@@ -36,8 +36,8 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
     const time = positionPercent / 100 * 24;
 
-    calculatedHours = Math.floor(time);
-    calculatedMinutes = Math.floor((time % 1) * 60); // % 1 to get the decimal part
+    setCalculatedHours(Math.floor(time));
+    setCalculatedMinutes(Math.floor((time % 1) * 60)); // % 1 to get the decimal part
 
     setPosition(positionPercent);
   };
@@ -56,7 +56,12 @@ export default function CalendarEvent({ event }: { event: EventType }) {
   // Handle start of resizing to prevent drag interference
   const handleStartResize = (resizeType: 'top' | 'bottom', e: React.MouseEvent, data: any) => {
     e.stopPropagation();
-    setResizePosition((event.hour * 60 + event.minute) / (24 * 60) * 100);
+
+    console.log('start', position);
+    setStartY(position);
+    setCalculatedDuration(event.duration);
+    setCalculatedHours(event.hour);
+    setCalculatedMinutes(event.minute);
   };
 
   // Function to handle resizing the event
@@ -80,41 +85,53 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
     if(resizeType === 'top') 
     {
-      let newDuration = (position - resizePercent) / 100 * 24 * 60;
+      let newDuration = (startY - resizePercent) / 100 * 24 * 60;
       newDuration += event.duration;
 
-      console.log(newDuration);
+      const time = resizePercent / 100 * 24;
+      setCalculatedHours(Math.floor(time));
+      setCalculatedMinutes(Math.floor((time % 1) * 60)); // % 1 to get the decimal
+      setCalculatedDuration(Math.round(newDuration));
 
       if(newDuration < 14) // 14 because of floating point errors
       { // Minimum duration of 15 minutes
         return;
       }
-      setResizePosition(resizePercent);
+      setPosition(resizePercent);
       setResizeHeight(Math.abs(newDuration / (24 * 60) * 100));
     }
     else{ // for bottom we don't need to calculate the new position
       const newDuration = (resizePercent - position) / 100 * 24 * 60;
-      console.log(newDuration);
+
       if(newDuration < 14)
       { // Minimum duration of 15 minutes
         return;
       }
       setResizeHeight(newDuration / (24 * 60) * 100);
+
+      setCalculatedHours(event.hour);
+      setCalculatedMinutes(event.minute);
+      setCalculatedDuration(Math.round(newDuration));
     }
   };
 
   // Handle resize stop
   const handleResizeStop = () => {
-    setIsResizing(false);
+
+    if (!isResizing) return;
+
+    UpdateEvent({ ...event, duration: calculatedDuration, hour: calculatedHours, minute: calculatedMinutes })
+      .catch(console.error)
+      .finally(() => {
+        setIsResizing(false);
+      });
     // Update the event duration based on resize
     // UpdateEvent logic for resizing if needed
   };
 
   const getTop  = () => {
-    if(isDragging)
+    if(isDragging || isResizing)
       return position;
-    if(isResizing)
-      return resizePosition;
     return (event.hour * 60 + event.minute) / (24 * 60) * 100;
   }
 
@@ -124,6 +141,11 @@ export default function CalendarEvent({ event }: { event: EventType }) {
     return event.duration / (24 * 60) * 100
   }
 
+  const getTime = () => {
+    if(isDragging || isResizing)
+      return `${calculatedHours}:${calculatedMinutes}`;
+    return `${event.hour}:${event.minute || '00'}`;
+  }
   return (
     <DraggableCore
       onDrag={(e, data) => handleDrag(data)} // Handle continuous dragging
@@ -151,7 +173,7 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
         <div className="flex justify-between left-0">
           <h1 className="text-white text-lg p-4">
-            {event.hour}:{event.minute ? event.minute : '00'}
+            {getTime()}
           </h1>
         </div>
 
