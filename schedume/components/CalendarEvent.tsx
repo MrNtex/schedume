@@ -20,14 +20,21 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
   const step = 100 / 24 / 4; // step every 15 minutes
 
+  const dragOffset = useRef(0);
+
+  const handleStartDrag = (e: React.MouseEvent) => {
+    const rect = eventRef.current?.getBoundingClientRect();
+    if (rect) dragOffset.current = e.clientY - rect.top;
+  }
   // Function to handle drag event
-  const handleDrag = (data: { y: number }) => {
+  const handleDrag = (data: { y: number }, e: React.MouseEvent) => {
     if (!isDragging) setIsDragging(true); // Set dragging state to true
     const parentElement = eventRef.current?.parentElement; // Get the parent element
     if (!parentElement) return; // Guard clause if parent is not found
 
     const parentHeight = parentElement.clientHeight || 1; // Get the parent height, avoid division by 0
-    const newY = data.y; // Get the current dragged y-position
+    
+    const newY = data.y - dragOffset.current; // Get the current dragged y-position
 
     // Calculate the percentage of the dragged position relative to the parent's height
     let positionPercent = (newY / parentHeight) * 100;
@@ -57,7 +64,6 @@ export default function CalendarEvent({ event }: { event: EventType }) {
   const handleStartResize = (resizeType: 'top' | 'bottom', e: React.MouseEvent, data: any) => {
     e.stopPropagation();
 
-    console.log('start', position);
     setStartY(position);
     setCalculatedDuration(event.duration);
     setCalculatedHours(event.hour);
@@ -143,12 +149,13 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
   const getTime = () => {
     if(isDragging || isResizing)
-      return `${calculatedHours}:${calculatedMinutes}`;
+      return `${calculatedHours}:${calculatedMinutes || '00'}`;
     return `${event.hour}:${event.minute || '00'}`;
   }
   return (
     <DraggableCore
-      onDrag={(e, data) => handleDrag(data)} // Handle continuous dragging
+      onStart={(e) => handleStartDrag(e)} // Start dragging
+      onDrag={(e, data) => handleDrag(data, e)} // Handle continuous dragging
       onStop={(e, data) => handleStop()} // Finalize and log the position when dragging stops
     >
       <div
@@ -165,7 +172,7 @@ export default function CalendarEvent({ event }: { event: EventType }) {
           onDrag={(e, data) => handleResize('top',e, data)}
           onStop={handleResizeStop}
         >
-          <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize bg-cyan-700"></div>
+          <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-t-xl transition ease-in-out"></div>
         </DraggableCore>
 
         <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
@@ -182,7 +189,7 @@ export default function CalendarEvent({ event }: { event: EventType }) {
           onDrag={(e, data) => handleResize('bottom',e, data)}
           onStop={handleResizeStop}
         >
-          <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize bg-cyan-700"></div>
+          <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-b-xl transition ease-in-out"></div>
         </DraggableCore>
       </div>
     </DraggableCore>

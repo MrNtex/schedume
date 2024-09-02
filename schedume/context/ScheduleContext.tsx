@@ -82,7 +82,7 @@ export function ScheduleProvider(props: { children: any }) {
         if(!isFiniteNumber(event.minute)) {
             event.minute = 0
         }
-        if(!isFiniteNumber(event.duration)) {
+        if(!isFiniteNumber(event.duration) || event.duration <= 0) {
             event.duration = 60
         }
     }
