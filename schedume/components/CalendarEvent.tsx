@@ -1,6 +1,6 @@
 import { EventType, useSchedule } from '@/context/ScheduleContext';
 import React, { useState, useRef } from 'react';
-import { DraggableCore, DraggableData } from 'react-draggable';
+import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
 export default function CalendarEvent({ event }: { event: EventType }) {
   const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
@@ -22,12 +22,15 @@ export default function CalendarEvent({ event }: { event: EventType }) {
 
   const dragOffset = useRef(0);
 
-  const handleStartDrag = (e: React.MouseEvent) => {
+  const handleStartDrag = (e: DraggableEvent) => {
     const rect = eventRef.current?.getBoundingClientRect();
+
+    e = e as MouseEvent;
+
     if (rect) dragOffset.current = e.clientY - rect.top;
   }
   // Function to handle drag event
-  const handleDrag = (data: { y: number }, e: React.MouseEvent) => {
+  const handleDrag = (data: { y: number }, e: DraggableEvent) => {
     if (!isDragging) setIsDragging(true); // Set dragging state to true
     const parentElement = eventRef.current?.parentElement; // Get the parent element
     if (!parentElement) return; // Guard clause if parent is not found
@@ -61,8 +64,8 @@ export default function CalendarEvent({ event }: { event: EventType }) {
   };
 
   // Handle start of resizing to prevent drag interference
-  const handleStartResize = (resizeType: 'top' | 'bottom', e: React.MouseEvent, data: any) => {
-    e.stopPropagation();
+  const handleStartResize = (resizeType: 'top' | 'bottom', e: DraggableEvent, data: any) => {
+    e.stopPropagation(); // Avoid event bubbling, with the drag event
 
     setStartY(position);
     setCalculatedDuration(event.duration);
@@ -71,7 +74,7 @@ export default function CalendarEvent({ event }: { event: EventType }) {
   };
 
   // Function to handle resizing the event
-  const handleResize = (resizeType: 'top' | 'bottom', e: React.MouseEvent, data: { y: number }) => {
+  const handleResize = (resizeType: 'top' | 'bottom', e: DraggableEvent, data: { y: number }) => {
     if (!isResizing)    setIsResizing(true);
     const parentElement = eventRef.current?.parentElement;
     if (!parentElement) return;
@@ -80,13 +83,13 @@ export default function CalendarEvent({ event }: { event: EventType }) {
     const parentHeight = parentElement.clientHeight || 1;
   
     // Calculate the mouse position relative to the parent during resize
+    e = e as MouseEvent;
+
     const relativeY = e.clientY - parentRect.top;
 
     let resizePercent = (relativeY / parentHeight) * 100;
     
-    // Adjust based on initial size and resize type
     resizePercent = Math.max(0, Math.min(100, Math.floor(resizePercent / step) * step)); // Keep within bounds and snap to steps
-    // Calculate the new duration based on resize
     
 
     if(resizeType === 'top') 
@@ -147,10 +150,40 @@ export default function CalendarEvent({ event }: { event: EventType }) {
     return event.duration / (24 * 60) * 100
   }
 
+  function durationToTime(duration: number, startHours: number, startMinutes: number) {
+    duration += startHours * 60 + startMinutes;
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+  }
+
   const getTime = () => {
     if(isDragging || isResizing)
-      return `${calculatedHours}:${calculatedMinutes || '00'}`;
+      return `${calculatedHours}:${calculatedMinutes || '00'}-${durationToTime(calculatedDuration, calculatedHours, calculatedMinutes)}`;
     return `${event.hour}:${event.minute || '00'}`;
+  }
+
+  const EventInsides = () => {
+    if(getHeight() > 5)
+    {
+      return (
+        <div className="flex justify-between left-0">
+          <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
+          <h1 className="text-white text-lg p-4">
+            {getTime()}
+          </h1>
+        </div>
+      )
+    }
+    else if(getHeight() > 2)
+    {
+      return (
+        <div className="absolute flex justify-between items-center left-0 top-0 px-4 w-full h-full">
+          <h1 className="text-white text-xl font-bold align-middle ">{event.title}</h1>
+          <h1 className="text-white text-md">{getTime()}</h1>
+        </div>
+      )
+    }
   }
   return (
     <DraggableCore
@@ -175,18 +208,18 @@ export default function CalendarEvent({ event }: { event: EventType }) {
           <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-t-xl transition ease-in-out"></div>
         </DraggableCore>
 
-        <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
-        <p className="text-white text-lg p-4">Event details</p>
+        <EventInsides/>
+        
+        {
+          getHeight() > 10 && <p className="text-white text-lg p-4">Event details</p>// Only show event details if the event is big enough
+        }
+        
 
-        <div className="flex justify-between left-0">
-          <h1 className="text-white text-lg p-4">
-            {getTime()}
-          </h1>
-        </div>
+        
 
         <DraggableCore
           onStart={(e, data) => handleStartResize('bottom', e, data)}
-          onDrag={(e, data) => handleResize('bottom',e, data)}
+          onDrag={(e, data) => handleResize('bottom', e, data)}
           onStop={handleResizeStop}
         >
           <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-b-xl transition ease-in-out"></div>
