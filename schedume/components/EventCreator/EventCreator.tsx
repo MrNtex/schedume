@@ -18,6 +18,7 @@ import TimeInput from "../TimeInput"
 import EventCreatorAdvanced from "./EventCreatorAdvanced"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import PrioritySelector from "./PrioritySelector"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 export interface AdvancedData {
   period?: string
@@ -62,11 +63,23 @@ export function EventCreator() {
       hour: parseInt(hour),
       minute: parseInt(minute),
       duration: 60,
-      id: ""
+      id: "",
+      EventTypeID: 0
     })
 
     console.log('Event created:', eventName, hour, minute)
   }
+
+  const EventType = () => {
+    return (
+      <div className="flex items-center">
+        <div className="rounded-full bg-cyan-400 w-3 h-3 border-2 border-zinc-900"/>
+        <div className="ml-2">More...</div>
+        
+      </div>
+    )
+  }
+  
 
   return (
     <Tabs defaultValue="basic" className="w-[20%]">
@@ -96,6 +109,21 @@ export function EventCreator() {
               </div>
 
               <PrioritySelector/>
+
+              <div className="flex flex-col space-y-1.5">
+                <Label>Type</Label>
+                <Select>
+                    <SelectTrigger id="period">
+                    <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                    <SelectItem value="EveryDay"><EventType/></SelectItem>
+                    <SelectItem value="EveryMonday">Every</SelectItem>
+                    <SelectItem value="Once">Once</SelectItem>
+                    <SelectItem value="Once">More...</SelectItem>
+                    </SelectContent>
+                </Select>
+              </div>
               
             </form>
           </CardContent>

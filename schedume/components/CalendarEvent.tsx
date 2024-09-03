@@ -1,8 +1,8 @@
-import { EventType, useSchedule } from '@/context/ScheduleContext';
+import { Event, EventType, useSchedule } from '@/context/ScheduleContext';
 import React, { useState, useRef } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
-export default function CalendarEvent({ event }: { event: EventType }) {
+export default function CalendarEvent({ event }: { event: Event }) {
   const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);

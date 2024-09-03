@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
-import { EventType } from '@/context/ScheduleContext';
+import { Event, EventType } from '@/context/ScheduleContext';
 import { Button } from './ui/button';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
 interface TimeInputProps {
-    event?: EventType;
+    event?: Event;
     onHourChange: (hour: string) => void;
     onMinuteChange: (minute: string) => void;
   }
