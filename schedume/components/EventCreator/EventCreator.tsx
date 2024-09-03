@@ -95,7 +95,7 @@ export function EventCreator() {
                 
               </div>
 
-              <PrioritySelector />
+              <PrioritySelector/>
               
             </form>
           </CardContent>
