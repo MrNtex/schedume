@@ -13,11 +13,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 import { useSchedule } from "@/context/ScheduleContext"
-import TimeInput from "./TimeInput"
-import { Slider } from "./ui/slider"
+import TimeInput from "../TimeInput"
+
 import EventCreatorAdvanced from "./EventCreatorAdvanced"
-import AccordionAdvancedData from "./AccordionAdvancedData"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
+import PrioritySelector from "./PrioritySelector"
 
 export interface AdvancedData {
   period?: string
@@ -95,17 +95,8 @@ export function EventCreator() {
                 
               </div>
 
-              <div>
-                <Label>Priority</Label>
-              </div>
-              <Slider
-                max={5}
-                step={1}
-                />
-
-              <AccordionAdvancedData>
-                <EventCreatorAdvanced data={advancedData} ShareAdvancedData={(data: AdvancedData) => ShareAdvancedData(data)} />
-              </AccordionAdvancedData>
+              <PrioritySelector />
+              
             </form>
           </CardContent>
           <CardFooter className="flex justify-between">
@@ -114,7 +105,23 @@ export function EventCreator() {
           </CardFooter>
         </Card>
       </TabsContent>
-      <TabsContent value="advanced"></TabsContent>
+      <TabsContent value="advanced">
+      <Card>
+          <CardHeader>
+            <CardTitle>Create event</CardTitle>
+            <CardDescription>Add new event in one click.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form>
+              <EventCreatorAdvanced data={advancedData} ShareAdvancedData={(data: AdvancedData) => ShareAdvancedData(data)} />
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" onClick={() => setCreatingEvent(false)}>Cancel</Button>
+            <Button onClick={() => handleCreateEvent()}>Deploy</Button>
+          </CardFooter>
+        </Card>
+      </TabsContent>
     </Tabs>
   )
 }

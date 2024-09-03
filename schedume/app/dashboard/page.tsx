@@ -3,7 +3,7 @@
 import Dashboard from '@/components/Dashboard'
 import { DashboardFloatingDock } from '@/components/DashboardFloatingDock'
 import DayCalendar from '@/components/DayCalendar'
-import { EventCreator } from '@/components/EventCreator'
+import { EventCreator } from '@/components/EventCreator/EventCreator'
 import Login from '@/components/Login'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useAuth } from '@/context/AuthContext'
