@@ -6,18 +6,22 @@ import {
   IconExchange,
   IconHome,
   IconNewSection,
+  IconPlus,
   IconTerminal2,
 } from "@tabler/icons-react";
 import Image from "next/image";
+import { useSchedule } from "@/context/ScheduleContext";
 
 export function DashboardFloatingDock() {
+  const { events, addEvent, removeEvent, loading, createEvent, newEventData } = useSchedule();
+
   const links = [
     {
-      title: "Home",
+      title: "New Event",
       icon: (
-        <IconHome className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <IconNewSection className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      onClick: () => { createEvent() }
     },
 
     {

@@ -138,6 +138,12 @@ export default function CalendarEvent({ event }: { event: EventType }) {
     // UpdateEvent logic for resizing if needed
   };
 
+  const handleClick = () => {
+    if(isDragging || isResizing)
+      return;
+    console.log('clicked');
+  }
+
   const getTop  = () => {
     if(isDragging || isResizing)
       return position;
@@ -198,6 +204,7 @@ export default function CalendarEvent({ event }: { event: EventType }) {
           top: `${getTop()}%`,
           height: `${getHeight()}%`,
         }}
+        onClick={handleClick}
       >
         {/* Top Resize Handler */}
         <DraggableCore

@@ -26,7 +26,7 @@ interface ScheduleContextType {
     addEvent: (event: EventType) => Promise<void>;
     removeEvent: (id: number) => Promise<void>;
 
-    createEvent: (hour: string) => void;
+    createEvent: (hour?: string) => void;
     setCreatingEvent: (value: boolean) => void;
     creatingEvent: boolean;
 
@@ -151,8 +151,10 @@ export function ScheduleProvider(props: { children: any }) {
         }
     }
 
-    function CreateEvent(hour: string) {
-        console.log('add event at', hour);
+    function CreateEvent(hour?: string) {
+        
+        hour = hour || '00:00'
+
         setCreatingEvent(true)
     
         setNewEventData({
@@ -161,18 +163,19 @@ export function ScheduleProvider(props: { children: any }) {
             hour: parseInt(hour.split(':')[0]),
             minute: parseInt(hour.split(':')[1]),
             duration: 60,
+            id: ''
         })
 
         console.log(creatingEvent)
     }
 
-    const removeEvent = async (id: number) => {
+    const removeEvent = async (id: string) => {
         if (!user) {
             throw new Error('User not logged in')
             return
         }
-
-        await deleteDoc(doc(db, 'users', user.uid, 'events', id.toString()))
+    
+        await deleteDoc(doc(db, 'users', user.uid, 'events', id))
         setEvents(prevEvents => prevEvents.filter(event => event.id !== id))
     }
 
