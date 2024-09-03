@@ -2,8 +2,9 @@
 
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect} from 'react'
+import { DefaultEvents } from './ScheduleContext'
 
 interface AuthContextType {
   user: User | null;
@@ -38,22 +39,45 @@ export function AuthProvider(props: { children: any }) {
 
   // AUTH HAN
   function signup(email: string, password: string, firstName: string, lastName: string) {
+    let uid = '';
     return createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user
-      const docRef = doc(db, 'users', user.uid)
-      return setDoc(docRef, {
-        email,
-        firstName,
-        lastName,
-        uid: user.uid
+      .then((userCredential) => {
+        const user = userCredential.user;
+        const docRef = doc(db, 'users', user.uid);
+  
+        uid = user.uid;
+        return setDoc(docRef, {
+          email,
+          firstName,
+          lastName,
+          uid: user.uid,
+        });
       })
-    })
-    .catch((error) => {
-      const errorCode = error.code
-      const errorMessage = error.message
-      console.log(errorCode, errorMessage)
-    })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      })
+      .then(() => {
+        if (uid === '') {
+          throw new Error('No user id');
+        }
+        // Correcting the path to reference 'event_types' collection inside the user's document
+        const eventsCollectionRef = collection(db, `users/${uid}/event_types`);
+  
+        DefaultEvents.map(async (event) => {
+          // Create a document inside the 'event_types' collection with the event id as the document id
+          const eventDocRef = doc(eventsCollectionRef, event.id);
+          await setDoc(eventDocRef, {
+            ...event, // Storing the event details
+          }, { merge: true });
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      });
   }
 
   function login(email: string, password: string) {
