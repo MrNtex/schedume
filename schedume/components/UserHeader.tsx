@@ -15,7 +15,7 @@ export default function UserHeader() {
   if (user) {
     return (
       <div>
-        <ul className="flex space-x-4">
+        <ul className="flex space-x-4 max-w-7xl">
           <li>
             <Link href="/dashboard">Dashboard</Link>
           </li>
@@ -29,7 +29,7 @@ export default function UserHeader() {
 
   return (
     <div>
-      <ul className="flex space-x-4">
+      <ul className="flex space-x-4 max-w-7xl">
         <li>
           <Link href="/login">Login</Link>
         </li>

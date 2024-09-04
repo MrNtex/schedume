@@ -209,7 +209,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
     >
       <div
         ref={eventRef} // Reference to the draggable element
-        className={`absolute rounded-xl px-5 w-[40%] ${isDragging ? 'bg-emerald-700' : 'bg-emerald-500'}`}
+        className={`absolute rounded-xl px-5 w-[40%] 'bg-emerald-500 ${isDragging && 'brightness-50'}`}
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,
@@ -223,7 +223,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
           onDrag={(e, data) => handleResize('top',e, data)}
           onStop={handleResizeStop}
         >
-          <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-t-xl transition ease-in-out"></div>
+          <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize hover:bg-black hover:bg-opacity-45 rounded-t-xl transition ease-in-out"></div>
         </DraggableCore>
 
         <EventInsides/>
@@ -240,7 +240,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
           onDrag={(e, data) => handleResize('bottom', e, data)}
           onStop={handleResizeStop}
         >
-          <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize hover:bg-emerald-800 rounded-b-xl transition ease-in-out"></div>
+          <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize hover:bg-black hover:bg-opacity-45 rounded-b-xl transition ease-in-out"></div>
         </DraggableCore>
       </div>
     </DraggableCore>
