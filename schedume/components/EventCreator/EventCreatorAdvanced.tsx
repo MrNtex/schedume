@@ -16,6 +16,8 @@ export default function EventCreatorAdvanced({
   const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const weekday = weekdays[new Date().getDay()]
 
+  
+
   return (
     
     <div className="flex flex-col space-y-1.5">

@@ -19,6 +19,7 @@ import EventCreatorAdvanced from "./EventCreatorAdvanced"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import PrioritySelector from "./PrioritySelector"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { useAuth } from "@/context/AuthContext"
 
 export interface AdvancedData {
   period?: string
@@ -31,6 +32,7 @@ export function EventCreator() {
   const [hour, setHour] = React.useState('')
   const [minute, setMinute] = React.useState('')
 
+  const { userEventTypes } = useAuth()
   
   const [advancedData, setAdvancedData] = React.useState<AdvancedData>({
     description: ''
@@ -70,14 +72,20 @@ export function EventCreator() {
     console.log('Event created:', eventName, hour, minute)
   }
 
-  const EventType = () => {
-    return (
-      <div className="flex items-center">
-        <div className="rounded-full bg-cyan-400 w-3 h-3 border-2 border-zinc-900"/>
-        <div className="ml-2">More...</div>
-        
-      </div>
-    )
+  const EventTypes = () => {
+    return Object.keys(userEventTypes).map((key) => {
+      return (
+        <SelectItem value={key}>
+          <div className="flex items-center">
+            <div
+              className="rounded-full w-3 h-3 border-2 border-zinc-900"
+              style={{ backgroundColor: userEventTypes[key].color }}
+            />
+            <div className="ml-2">{userEventTypes[key].name}</div>
+          </div>
+        </SelectItem>
+      );
+    })
   }
   
 
@@ -117,10 +125,8 @@ export function EventCreator() {
                     <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                    <SelectItem value="EveryDay"><EventType/></SelectItem>
-                    <SelectItem value="EveryMonday">Every</SelectItem>
-                    <SelectItem value="Once">Once</SelectItem>
-                    <SelectItem value="Once">More...</SelectItem>
+                    <EventTypes/>
+                    <SelectItem value="More">Create more...</SelectItem>
                     </SelectContent>
                 </Select>
               </div>

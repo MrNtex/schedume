@@ -2,13 +2,14 @@
 
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect} from 'react'
 import { DefaultEvents } from './ScheduleContext'
 
 interface AuthContextType {
   user: User | null;
   userDataObj: any;
+  userEventTypes: any;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -18,6 +19,7 @@ interface AuthContextType {
 const defaultAuthContext: AuthContextType = {
   user: null,
   userDataObj: {},
+  userEventTypes: {},
   signup: async () => {},
   login: async () => {},
   logout: async () => {},
@@ -34,6 +36,7 @@ export function AuthProvider(props: { children: any }) {
 
   const [user, setUser] = useState<User | null>(null)
   const [userDataObj, setUserDataObj] = useState({})
+  const [userEventTypes, setUserEventTypes] = useState<Record<string, any>>({})
   const [loading, setLoading] = useState(true)
 
 
@@ -111,6 +114,16 @@ export function AuthProvider(props: { children: any }) {
           firebaseData = docSnap.data()
         }
         setUserDataObj(firebaseData)
+
+        // get user event types
+        const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types')
+        const eventsTypesSnapshot = await getDocs(eventsTypesCollection)
+
+        const userEventTypes = eventsTypesSnapshot.docs.reduce((types: Record<string, any>, doc) => {
+          types[doc.id] = { id: doc.id, ...doc.data() };
+          return types;
+        }, {});
+        setUserEventTypes(userEventTypes)
       } catch (err: any) {
         console.log(err.message)
       } finally {
@@ -122,6 +135,7 @@ export function AuthProvider(props: { children: any }) {
   const value: AuthContextType = {
     user,
     userDataObj,
+    userEventTypes,
     signup,
     login,
     logout,
