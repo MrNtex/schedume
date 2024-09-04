@@ -26,7 +26,7 @@ export interface AdvancedData {
   description: string
 }
 export function EventCreator() {
-  const { addEvent, newEventData, setCreatingEvent } = useSchedule()
+  const { addEvent, newEventData, setCreatingEvent, editingEvent, setEditingEvent } = useSchedule()
 
   const [eventName, setEventName] = React.useState('')
   const [hour, setHour] = React.useState('')
@@ -70,6 +70,11 @@ export function EventCreator() {
       setEventName('New Event')
     }
 
+    if(editingEvent)
+    {
+      
+    }
+
     addEvent({
       title: eventName,
       description: '',
@@ -81,6 +86,12 @@ export function EventCreator() {
     })
 
     console.log('Event created:', eventName, hour, minute)
+  }
+
+  function Close()
+  {
+    setCreatingEvent(false)
+    setEditingEvent(false)
   }
 
   const EventTypes = () => {
@@ -99,6 +110,15 @@ export function EventCreator() {
     })
   }
   
+  const Footer = () => {
+    return (
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={() => Close()}>Cancel</Button>
+        {editingEvent && <Button variant="destructive" onClick={() => Close()}>Delete Event</Button>}
+        <Button onClick={() => handleCreateEvent()}>Deploy</Button>
+      </CardFooter>
+    )
+  }
 
   return (
     <Tabs defaultValue="basic" className="w-[20%]">
@@ -117,7 +137,10 @@ export function EventCreator() {
               <div className="grid w-full items-center gap-4">
                 <div>
                   <Label htmlFor="time">Time</Label>
-                  <TimeInput event={newEventData} onHourChange={(s: string) => setHour(s)} onMinuteChange={(s: string) => setMinute(s)}/>
+                  <div className="flex justify-center">
+                    <TimeInput event={newEventData} onHourChange={(s: string) => setHour(s)} onMinuteChange={(s: string) => setMinute(s)}/>
+                  </div>
+                  
                   
                 </div>
                 <div className="flex flex-col space-y-1.5">
@@ -144,10 +167,7 @@ export function EventCreator() {
               
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setCreatingEvent(false)}>Cancel</Button>
-            <Button onClick={() => handleCreateEvent()}>Deploy</Button>
-          </CardFooter>
+          <Footer/>
         </Card>
       </TabsContent>
       <TabsContent value="advanced">
@@ -161,10 +181,7 @@ export function EventCreator() {
               <EventCreatorAdvanced data={advancedData} ShareAdvancedData={(data: AdvancedData) => ShareAdvancedData(data)} />
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setCreatingEvent(false)}>Cancel</Button>
-            <Button onClick={() => handleCreateEvent()}>Deploy</Button>
-          </CardFooter>
+          <Footer/>
         </Card>
       </TabsContent>
     </Tabs>

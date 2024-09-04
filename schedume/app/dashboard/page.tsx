@@ -32,7 +32,7 @@ export default function Page() {
 
 function MainContent() {
   // It's important to use the `useSchedule` hook inside the `ScheduleProvider` component
-  const { creatingEvent } = useSchedule();
+  const { creatingEvent,  } = useSchedule();
 
   return (
     <>

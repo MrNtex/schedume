@@ -31,6 +31,8 @@ export interface Event {
     duration: number; // Duration in minutes
     
     EventTypeID: number;
+
+    connectedEvent?: Event; // Primary used for events that are during the night and go into the next day
 }
 
 
@@ -46,6 +48,8 @@ interface ScheduleContextType {
     createEvent: (hour?: string) => void;
     setCreatingEvent: (value: boolean) => void;
     creatingEvent: boolean;
+    setEditingEvent: (value: boolean) => void;
+    editingEvent: boolean;
 
     UpdateEvent: (event: Event) => Promise<void>;
 
@@ -64,6 +68,8 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
     createEvent: () => {},
     setCreatingEvent: () => {},
     creatingEvent: false,
+    setEditingEvent: () => {},
+    editingEvent: false,
 
     UpdateEvent: async () => {},
 
@@ -82,6 +88,7 @@ export function ScheduleProvider(props: { children: any }) {
 
     const [loading, setLoading] = React.useState(true)
     const [creatingEvent, setCreatingEvent] = React.useState(false)
+    const [editingEvent, setEditingEvent] = React.useState(false)
     const [newEventData, setNewEventData] = React.useState<Event>()
 
     function isFiniteNumber(value: any): boolean {
@@ -222,6 +229,8 @@ export function ScheduleProvider(props: { children: any }) {
         createEvent: CreateEvent,
         creatingEvent: creatingEvent,
         setCreatingEvent: setCreatingEvent,
+        editingEvent: editingEvent,
+        setEditingEvent: setEditingEvent,
 
         UpdateEvent: UpdateEvent,
 

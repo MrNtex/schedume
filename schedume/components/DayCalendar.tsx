@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import CalendarEvent from './CalendarEvent';
 import { useSchedule } from '@/context/ScheduleContext';
 
@@ -32,14 +32,24 @@ export default function DayCalendar() {
         
       </div>)
   }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  const Events = () => {
+    return events.map((event) => (
+      <React.Fragment key={event.id}>
+        <CalendarEvent event={event} partial={false}/>
+        {event.hour * 60 + event.minute + event.duration > 24 * 60 && <CalendarEvent event={event} partial={true}/>}
+      </React.Fragment>
+    ));
+
+  }
 
   return (
     <div className='relative flex justify-center items-center py-5'>
       <div className=" relative w-[60%]">
-        {events
-          .map((event, idx) => (
-            <CalendarEvent event={event}/>
-          ))}
+        <Events />
         {/* Current Time Line */}
         {currentTime && (
           <div

@@ -3,7 +3,7 @@ import { Event, EventType, useSchedule } from '@/context/ScheduleContext';
 import React, { useState, useRef } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
-export default function CalendarEvent({ event }: { event: Event }) {
+export default function CalendarEvent({ event, partial }: { event: Event, partial: boolean }) {
   const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -147,14 +147,24 @@ export default function CalendarEvent({ event }: { event: Event }) {
   }
 
   const getTop  = () => {
+    if(partial) return 0;
     if(isDragging || isResizing)
       return position;
     return (event.hour * 60 + event.minute) / (24 * 60) * 100;
   }
 
   const getHeight = () => {
+    if(partial)
+    {
+      return (event.duration - (24 * 60 - (event.hour * 60 + event.minute))) / (24 * 60) * 100;
+    }
+
     if(isResizing)
       return resizeHeight;
+    if(event.hour * 60 + event.minute + event.duration > 24 * 60)
+    {
+      return 100 - getTop();
+    }
     return event.duration / (24 * 60) * 100
   }
 
@@ -201,6 +211,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
       )
     }
   }
+    
   return (
     <DraggableCore
       onStart={(e) => handleStartDrag(e)} // Start dragging
