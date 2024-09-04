@@ -1,3 +1,4 @@
+import { useAuth } from '@/context/AuthContext';
 import { Event, EventType, useSchedule } from '@/context/ScheduleContext';
 import React, { useState, useRef } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
@@ -9,6 +10,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
   const [resizeHeight, setResizeHeight] = useState(0);
   const eventRef = useRef<HTMLDivElement>(null); // Reference to the draggable element
 
+  const { userEventTypes } = useAuth();
   const { UpdateEvent } = useSchedule();
 
   const [calculatedHours, setCalculatedHours] = useState(event.hour);
@@ -169,6 +171,14 @@ export default function CalendarEvent({ event }: { event: Event }) {
     return `${event.hour}:${event.minute || '00'}`;
   }
 
+  const getColor = () => {
+    if(event.EventTypeID in userEventTypes)
+    {
+      return userEventTypes[event.EventTypeID].color;
+    }
+    return 'bg-emerald-500';
+  }
+
   const EventInsides = () => {
     if(getHeight() > 5)
     {
@@ -203,6 +213,7 @@ export default function CalendarEvent({ event }: { event: Event }) {
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,
+          backgroundColor: `${getColor()}`,
         }}
         onClick={handleClick}
       >

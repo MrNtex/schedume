@@ -32,6 +32,8 @@ export function EventCreator() {
   const [hour, setHour] = React.useState('')
   const [minute, setMinute] = React.useState('')
 
+  const [eventTypeID, setEventTypeID] = React.useState(-1) // -1 means no type selected
+
   const { userEventTypes } = useAuth()
   
   const [advancedData, setAdvancedData] = React.useState<AdvancedData>({
@@ -40,6 +42,15 @@ export function EventCreator() {
 
   const ShareAdvancedData = (data: AdvancedData) => {
     setAdvancedData(data)
+  }
+
+  function handleValueChange(id: number) {
+    if(id in userEventTypes)
+    {
+      setEventTypeID(id)
+      return
+    }
+    setEventTypeID(-1);
   }
 
   function handleCreateEvent() {
@@ -66,7 +77,7 @@ export function EventCreator() {
       minute: parseInt(minute),
       duration: 60,
       id: "",
-      EventTypeID: 0
+      EventTypeID: eventTypeID
     })
 
     console.log('Event created:', eventName, hour, minute)
@@ -120,7 +131,7 @@ export function EventCreator() {
 
               <div className="flex flex-col space-y-1.5">
                 <Label>Type</Label>
-                <Select>
+                <Select onValueChange={(value) => handleValueChange(parseInt(value))}>
                     <SelectTrigger id="period">
                     <SelectValue placeholder="Select" />
                     </SelectTrigger>
