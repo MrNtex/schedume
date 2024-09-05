@@ -4,6 +4,7 @@ import { Label } from '@radix-ui/react-dropdown-menu'
 import { AdvancedData } from './EventCreator'
 import { Input } from '../ui/input';
 import WeekRangeSelector from './WeekRangeSelector';
+import { DatePickerWithRange } from '../ui/datepicker';
 
 export default function EventCreatorAdvanced({
     data,
@@ -29,14 +30,17 @@ export default function EventCreatorAdvanced({
             <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
-            <SelectItem value="EveryDay">Every day</SelectItem>
+            <SelectItem value="EveryDay">Everyday</SelectItem>
             <SelectItem value="EveryMonday">Every {weekday}</SelectItem>
-            <SelectItem value="Once">Once</SelectItem>
+            <SelectItem value="RangeWeek">Select Week Range...</SelectItem>
             <SelectItem value="More">More...</SelectItem>
+            
             </SelectContent>
         </Select>
 
-        <WeekRangeSelector/>
+        {period === 'More' && <DatePickerWithRange/>}
+        {period === 'RangeWeek' && <WeekRangeSelector/>}
+        
         <Label>Duration</Label>
         <Input id="duration" placeholder="60" onChange={(e) => ShareAdvancedData({...data, duration: parseInt(e.target.value)})}/>
     </div>

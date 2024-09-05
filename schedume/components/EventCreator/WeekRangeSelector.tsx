@@ -34,8 +34,8 @@ export default function WeekRangeSelector() {
         <Slider.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
           <Slider.Range className="absolute h-full bg-blue-500 rounded-full" />
         </Slider.Track>
-        <Slider.Thumb className="block bg-emerald-300 h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ zIndex: 20 }} />
-        <Slider.Thumb className="block bg-emerald-300 h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ zIndex: 20 }} />
+        <Slider.Thumb className="block cursor-e-resize bg-emerald-300 h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ zIndex: 20 }} />
+        <Slider.Thumb className="block cursor-e-resize bg-emerald-300 h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" style={{ zIndex: 20 }} />
       </Slider.Root>
       <p className="mt-4 text-sm">
         Selected Range: {selectedRange()}

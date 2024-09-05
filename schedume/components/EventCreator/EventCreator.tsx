@@ -38,7 +38,8 @@ export function EventCreator() {
   const { userEventTypes } = useAuth()
   
   const [advancedData, setAdvancedData] = React.useState<AdvancedData>({
-    description: ''
+    description: '',
+    duration: 60
   })
 
   const ShareAdvancedData = (data: AdvancedData) => {
@@ -78,7 +79,7 @@ export function EventCreator() {
         description: '',
         hour: parseInt(hour),
         minute: parseInt(minute),
-        duration: 60,
+        duration: advancedData.duration,
         id: newEventData.id,
         EventTypeID: eventTypeID
       })
