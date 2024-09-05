@@ -24,15 +24,16 @@ import { useAuth } from "@/context/AuthContext"
 export interface AdvancedData {
   period?: string
   description: string
+  duration: number
 }
 export function EventCreator() {
-  const { addEvent, newEventData, setCreatingEvent, editingEvent, setEditingEvent } = useSchedule()
+  const { addEvent, newEventData, setCreatingEvent, UpdateEvent, removeEvent } = useSchedule()
 
-  const [eventName, setEventName] = React.useState('')
-  const [hour, setHour] = React.useState('')
-  const [minute, setMinute] = React.useState('')
+  const [eventName, setEventName] = React.useState(newEventData?.title || '')
+  const [hour, setHour] = React.useState(newEventData?.hour.toString() || '')
+  const [minute, setMinute] = React.useState(newEventData?.minute.toString() || '')
 
-  const [eventTypeID, setEventTypeID] = React.useState(-1) // -1 means no type selected
+  const [eventTypeID, setEventTypeID] = React.useState(newEventData?.EventTypeID || -1) // -1 means no type selected
 
   const { userEventTypes } = useAuth()
   
@@ -70,28 +71,43 @@ export function EventCreator() {
       setEventName('New Event')
     }
 
-    if(editingEvent)
+    if(newEventData?.id)
     {
-      
+      UpdateEvent({
+        title: eventName,
+        description: '',
+        hour: parseInt(hour),
+        minute: parseInt(minute),
+        duration: 60,
+        id: newEventData.id,
+        EventTypeID: eventTypeID
+      })
+    }else{
+      addEvent({
+        title: eventName,
+        description: '',
+        hour: parseInt(hour),
+        minute: parseInt(minute),
+        duration: 60,
+        id: "",
+        EventTypeID: eventTypeID
+      })
     }
-
-    addEvent({
-      title: eventName,
-      description: '',
-      hour: parseInt(hour),
-      minute: parseInt(minute),
-      duration: 60,
-      id: "",
-      EventTypeID: eventTypeID
-    })
+    
 
     console.log('Event created:', eventName, hour, minute)
   }
 
+  function handleDeleteEvent() {
+    setCreatingEvent(false)
+    if(newEventData?.id)
+    {
+      removeEvent(newEventData.id)
+    }
+  }
   function Close()
   {
     setCreatingEvent(false)
-    setEditingEvent(false)
   }
 
   const EventTypes = () => {
@@ -114,7 +130,7 @@ export function EventCreator() {
     return (
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={() => Close()}>Cancel</Button>
-        {editingEvent && <Button variant="destructive" onClick={() => Close()}>Delete Event</Button>}
+        {newEventData?.id && <Button variant="destructive" onClick={() => handleDeleteEvent()}>Delete Event</Button>}
         <Button onClick={() => handleCreateEvent()}>Deploy</Button>
       </CardFooter>
     )

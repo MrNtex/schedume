@@ -43,17 +43,16 @@ interface ScheduleContextType {
     loading: boolean;
 
     addEvent: (event: Event) => Promise<void>;
-    removeEvent: (id: number) => Promise<void>;
+    removeEvent: (id: string) => Promise<void>;
 
     createEvent: (hour?: string) => void;
     setCreatingEvent: (value: boolean) => void;
     creatingEvent: boolean;
-    setEditingEvent: (value: boolean) => void;
-    editingEvent: boolean;
 
     UpdateEvent: (event: Event) => Promise<void>;
 
     newEventData?: Event;
+    setNewEventData: (event: Event) => void;
 }
 
 const ScheduleContext = React.createContext<ScheduleContextType>({
@@ -68,12 +67,11 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
     createEvent: () => {},
     setCreatingEvent: () => {},
     creatingEvent: false,
-    setEditingEvent: () => {},
-    editingEvent: false,
 
     UpdateEvent: async () => {},
 
     newEventData: undefined,
+    setNewEventData: () => {},
 })
 
 export function useSchedule() {
@@ -109,7 +107,7 @@ export function ScheduleProvider(props: { children: any }) {
         if(!isFiniteNumber(event.minute)) {
             event.minute = 0
         }
-        if(!isFiniteNumber(event.duration) || event.duration <= 0) {
+        if(!isFiniteNumber(event.duration) || event.duration <= 0 || event.duration > 24 * 60) {
             event.duration = 60
         }
     }
@@ -154,7 +152,6 @@ export function ScheduleProvider(props: { children: any }) {
     const addEvent = async (event: Event) => {
         if (!user) {
             throw new Error('User not logged in')
-            return
         }
 
         ValidateEvent(event)
@@ -169,9 +166,9 @@ export function ScheduleProvider(props: { children: any }) {
         if(event.id === undefined) { throw new Error('Event id is undefined') }
         if (!user) {
             throw new Error('User not logged in')
-            return
         }
     
+        ValidateEvent(event);
         try {
             const eventDocRef = doc(db, 'users', user.uid, 'events', event.id.toString())
     
@@ -224,17 +221,16 @@ export function ScheduleProvider(props: { children: any }) {
         loading: false,
 
         addEvent: addEvent,
-        removeEvent: async () => {},
+        removeEvent: removeEvent,
 
         createEvent: CreateEvent,
         creatingEvent: creatingEvent,
         setCreatingEvent: setCreatingEvent,
-        editingEvent: editingEvent,
-        setEditingEvent: setEditingEvent,
 
         UpdateEvent: UpdateEvent,
 
         newEventData: newEventData,
+        setNewEventData: setNewEventData,
     }
 
     return (
