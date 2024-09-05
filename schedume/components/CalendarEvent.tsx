@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import { Event, EventType, useSchedule } from '@/context/ScheduleContext';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
 export default function CalendarEvent({ event, partial }: { event: Event, partial: boolean }) {
@@ -13,10 +13,12 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
   const { userEventTypes } = useAuth();
   const { UpdateEvent } = useSchedule();
 
-  const [calculatedHours, setCalculatedHours] = useState(event.hour);
-  const [calculatedMinutes, setCalculatedMinutes] = useState(event.minute);
-
-  const [calculatedDuration, setCalculatedDuration] = useState(event.duration);
+  
+  const [tempEvent, setTempEvent] = useState(event);
+  // Sync tempEvent with event whenever event changes
+  useEffect(() => {
+    setTempEvent(event);
+  }, [event]);
 
   const [startY, setStartY] = useState(0);
 
@@ -48,8 +50,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
 
     const time = positionPercent / 100 * 24;
 
-    setCalculatedHours(Math.floor(time));
-    setCalculatedMinutes(Math.floor((time % 1) * 60)); // % 1 to get the decimal part
+    setTempEvent({ ...event, hour: Math.floor(time), minute: Math.floor((time % 1) * 60) }); // % 1 to get the decimal part
 
     setPosition(positionPercent);
   };
@@ -58,7 +59,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
   const handleStop = () => {
     if (position === -1 || !isDragging) return; // Guard clause if position is not set
     // Update the event with the new calculated hours and minutes
-    UpdateEvent({ ...event, hour: calculatedHours, minute: calculatedMinutes })
+    UpdateEvent({ ...event, hour: tempEvent.hour, minute: tempEvent.minute })
       .catch(console.error)
       .finally(() => {
         setIsDragging(false); // Set dragging state to false
@@ -70,9 +71,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
     e.stopPropagation(); // Avoid event bubbling, with the drag event
 
     setStartY(position);
-    setCalculatedDuration(event.duration);
-    setCalculatedHours(event.hour);
-    setCalculatedMinutes(event.minute);
+    setTempEvent(event);
   };
 
   // Function to handle resizing the event
@@ -100,9 +99,8 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
       newDuration += event.duration;
 
       const time = resizePercent / 100 * 24;
-      setCalculatedHours(Math.floor(time));
-      setCalculatedMinutes(Math.floor((time % 1) * 60)); // % 1 to get the decimal
-      setCalculatedDuration(Math.round(newDuration));
+
+      setTempEvent({ ...event, hour: Math.floor(time), minute: Math.floor((time % 1) * 60), duration: Math.round(newDuration) }); // % 1 to get the decimal part
 
       if(newDuration < 14) // 14 because of floating point errors
       { // Minimum duration of 15 minutes
@@ -120,9 +118,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
       }
       setResizeHeight(newDuration / (24 * 60) * 100);
 
-      setCalculatedHours(event.hour);
-      setCalculatedMinutes(event.minute);
-      setCalculatedDuration(Math.round(newDuration));
+      setTempEvent({ ...event, duration: Math.round(newDuration) });
     }
   };
 
@@ -131,7 +127,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
 
     if (!isResizing) return;
 
-    UpdateEvent({ ...event, duration: calculatedDuration, hour: calculatedHours, minute: calculatedMinutes })
+    UpdateEvent({ ...event, duration: tempEvent.duration, hour: tempEvent.hour, minute: tempEvent.minute })
       .catch(console.error)
       .finally(() => {
         setIsResizing(false);
@@ -143,7 +139,6 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
   const handleClick = () => {
     if(isDragging || isResizing)
       return;
-    console.log('clicked');
   }
 
   const getTop  = () => {
@@ -161,11 +156,11 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
 
     if(isResizing)
       return resizeHeight;
-    if(event.hour * 60 + event.minute + event.duration > 24 * 60)
+    if(tempEvent.hour * 60 + tempEvent.minute + tempEvent.duration > 24 * 60)
     {
       return 100 - getTop();
     }
-    return event.duration / (24 * 60) * 100
+    return tempEvent.duration / (24 * 60) * 100
   }
 
   function durationToTime(duration: number, startHours: number, startMinutes: number) {
@@ -177,7 +172,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
 
   const getTime = () => {
     if(isDragging || isResizing)
-      return `${calculatedHours}:${calculatedMinutes || '00'}-${durationToTime(calculatedDuration, calculatedHours, calculatedMinutes)}`;
+      return `${tempEvent.hour}:${tempEvent.minute || '00'}-${durationToTime(tempEvent.duration, tempEvent.hour, tempEvent.minute)}`;
     return `${event.hour}:${event.minute || '00'}`;
   }
 
