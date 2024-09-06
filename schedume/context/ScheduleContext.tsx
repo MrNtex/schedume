@@ -21,38 +21,41 @@ export const DefaultEvents: EventType[] = [
     { id:'3', name: 'Liesure', color: '#FFFF00' },
 ]
 
-export interface Event {
-    id: string;
-    title: string;
-    description: string;
-    hour: number;
-    minute: number;
+export class ScheduleEvent {
+    id: string = '';
+    title: string = '';
+    description: string = '';
+    hour: number = 12;
+    minute: number = 0;
 
-    duration: number; // Duration in minutes
+    duration: number = 60; // Duration in minutes
     
-    EventTypeID: number;
+    EventTypeID: number = -1; // -1 means no type selected
 
-    connectedEvent?: Event; // Primary used for events that are during the night and go into the next day
+    connectedEvent?: ScheduleEvent; // Primary used for events that are during the night and go into the next day
+
+    constructor(hour: number, minute: number = 0) {
+        this.hour = hour;
+        this.minute = minute;
+    }
 }
-
+  
 
 interface ScheduleContextType {
-    events: Event[];
-    EventDict: { [id: string]: Event };
+    events: ScheduleEvent[];
+    EventDict: { [id: string]: ScheduleEvent };
 
     loading: boolean;
 
-    addEvent: (event: Event) => Promise<void>;
+    addEvent: (event: ScheduleEvent) => Promise<void>;
     removeEvent: (id: string) => Promise<void>;
 
-    createEvent: (hour?: string) => void;
-    setCreatingEvent: (value: boolean) => void;
-    creatingEvent: boolean;
+    UpdateEvent: (event: ScheduleEvent) => Promise<void>;
 
-    UpdateEvent: (event: Event) => Promise<void>;
+    newEventData?: ScheduleEvent;
+    setNewEventData: (event: ScheduleEvent) => void;
 
-    newEventData?: Event;
-    setNewEventData: (event: Event) => void;
+    debug: () => void;
 }
 
 const ScheduleContext = React.createContext<ScheduleContextType>({
@@ -63,15 +66,13 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
 
     addEvent: async () => {},
     removeEvent: async () => {},
-    
-    createEvent: () => {},
-    setCreatingEvent: () => {},
-    creatingEvent: false,
 
     UpdateEvent: async () => {},
 
-    newEventData: undefined,
+    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: ''},
     setNewEventData: () => {},
+
+    debug: () => {},
 })
 
 export function useSchedule() {
@@ -81,20 +82,22 @@ export function useSchedule() {
 
 export function ScheduleProvider(props: { children: any }) {
     const { user } = useAuth()
-    const [events, setEvents] = React.useState<Event[]>([])
-    const [EventDict, setEventDict] = React.useState<{ [id: string]: Event }>({})
+    const [events, setEvents] = React.useState<ScheduleEvent[]>([])
+    const [EventDict, setEventDict] = React.useState<{ [id: string]: ScheduleEvent }>({})
 
     const [loading, setLoading] = React.useState(true)
-    const [creatingEvent, setCreatingEvent] = React.useState(false)
-    const [editingEvent, setEditingEvent] = React.useState(false)
-    const [newEventData, setNewEventData] = React.useState<Event>()
+
+    const [newEventData, setNewEventData] = React.useState<ScheduleEvent>()
+    useEffect(() => {
+        console.log('new event data:', newEventData)
+    }, [newEventData])
 
     function isFiniteNumber(value: any): boolean {
         // Check if the value is a finite number
         return typeof value === 'number' && Number.isFinite(value);
       }
 
-    function ValidateEvent(event: Event) {
+    function ValidateEvent(event: ScheduleEvent) {
         if(!event.title || event.title.length === 0) {
             event.title = 'Untitled Event'
         }
@@ -124,16 +127,16 @@ export function ScheduleProvider(props: { children: any }) {
                 const eventsCollection = collection(db, 'users', user.uid, 'events')
                 const eventsSnapshot = await getDocs(eventsCollection)
 
-                const userEvents = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as Event[];
+                const userEvents = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as ScheduleEvent[];
 
                 const EventsCollection = collection(db, 'users', user.uid, 'Events')
                 const EventsSnapshot = await getDocs(EventsCollection)
-                const EventsArray = EventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as Event[];
+                const EventsArray = EventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as ScheduleEvent[];
 
                 const EventsDictionary = EventsArray.reduce((acc, Event) => {
                 acc[Event.id] = Event;
                 return acc;
-                }, {} as Record<string, Event>);
+                }, {} as Record<string, ScheduleEvent>);
                 setEventDict(EventsDictionary)
                 setEvents(userEvents)
             } catch (error) {
@@ -149,7 +152,7 @@ export function ScheduleProvider(props: { children: any }) {
     }, [user])
 
 
-    const addEvent = async (event: Event) => {
+    const addEvent = async (event: ScheduleEvent) => {
         if (!user) {
             throw new Error('User not logged in')
         }
@@ -162,7 +165,7 @@ export function ScheduleProvider(props: { children: any }) {
         console.log('Event added:', event)
     }
     
-    const UpdateEvent = async (event: Event) => {
+    const UpdateEvent = async (event: ScheduleEvent) => {
         if(event.id === undefined) { throw new Error('Event id is undefined') }
         if (!user) {
             throw new Error('User not logged in')
@@ -185,24 +188,7 @@ export function ScheduleProvider(props: { children: any }) {
         }
     }
 
-    function CreateEvent(hour?: string) {
-        
-        hour = hour || '00:00'
-
-        setCreatingEvent(true)
     
-        setNewEventData({
-            title: '',
-            description: '',
-            hour: parseInt(hour.split(':')[0]),
-            minute: parseInt(hour.split(':')[1]),
-            duration: 60,
-            id: '',
-            EventTypeID: 0,
-        })
-
-        console.log(creatingEvent)
-    }
 
     const removeEvent = async (id: string) => {
         if (!user) {
@@ -214,6 +200,10 @@ export function ScheduleProvider(props: { children: any }) {
         setEvents(prevEvents => prevEvents.filter(event => event.id !== id))
     }
 
+    function debug() {
+        console.log('Events:', events)
+        console.log('EventDict:', EventDict)
+    }
 
     const value = {
         events: events,
@@ -223,14 +213,12 @@ export function ScheduleProvider(props: { children: any }) {
         addEvent: addEvent,
         removeEvent: removeEvent,
 
-        createEvent: CreateEvent,
-        creatingEvent: creatingEvent,
-        setCreatingEvent: setCreatingEvent,
-
         UpdateEvent: UpdateEvent,
 
         newEventData: newEventData,
         setNewEventData: setNewEventData,
+
+        debug: debug,
     }
 
     return (

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
-import { Event, EventType } from '@/context/ScheduleContext';
+import { ScheduleEvent, EventType } from '@/context/ScheduleContext';
 import { Button } from './ui/button';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
 interface TimeInputProps {
-    event?: Event;
+    event?: ScheduleEvent;
     onHourChange: (hour: string) => void;
     onMinuteChange: (minute: string) => void;
   }
@@ -21,7 +21,6 @@ export default function TimeInput({
   if(event) defaultHour = event.hour < 10 ? `0${event.hour}` : event.hour.toString();
   const [hour, setHour] = useState(defaultHour);
   const [minute, setMinute] = useState('');
-
 
   useEffect(() => {
     onHourChange(hour);

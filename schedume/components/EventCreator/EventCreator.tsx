@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import PrioritySelector from "./PrioritySelector"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useAuth } from "@/context/AuthContext"
+import { useDashboard } from "@/app/dashboard/page"
 
 export interface AdvancedData {
   period?: string
@@ -27,7 +28,8 @@ export interface AdvancedData {
   duration: number
 }
 export function EventCreator() {
-  const { addEvent, newEventData, setCreatingEvent, UpdateEvent, removeEvent } = useSchedule()
+  const { addEvent, newEventData, UpdateEvent, removeEvent } = useSchedule()
+  const { creatingEvent, setCreatingEvent } = useDashboard()
 
   const [eventName, setEventName] = React.useState(newEventData?.title || '')
   const [hour, setHour] = React.useState(newEventData?.hour.toString() || '')
@@ -114,7 +116,7 @@ export function EventCreator() {
   const EventTypes = () => {
     return Object.keys(userEventTypes).map((key) => {
       return (
-        <SelectItem value={key}>
+        <SelectItem value={key} key={key}>
           <div className="flex items-center">
             <div
               className="rounded-full w-3 h-3 border-2 border-zinc-900"

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import CalendarEvent from './CalendarEvent';
 import { useSchedule } from '@/context/ScheduleContext';
+import { useDashboard } from '@/app/dashboard/page';
+import { ScheduleEvent } from '@/context/ScheduleContext';
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 
 export default function DayCalendar() {
-  const { events, addEvent, removeEvent, loading, createEvent, newEventData } = useSchedule();
+  const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
+  const { CreateEvent } = useDashboard();
 
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -28,7 +31,7 @@ export default function DayCalendar() {
   const Hour = ({ hour }: { hour: string }) => {
     return (
         <div className="px-6 pb-12 flex items-center justify-center text-sm text-gray-800 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 dark:text-white dark:before:border-neutral-600 dark:after:border-neutral-600">
-          <div className="hover:bg-emerald-500 px-2 rounded-sm ease-in-out transition duration-300 cursor-pointer absolute" onClick={() => createEvent(hour)}>{hour}</div>
+          <div className="hover:bg-emerald-500 px-2 rounded-sm ease-in-out transition duration-300 cursor-pointer absolute" onClick={() => CreateEvent(new ScheduleEvent(parseInt(hour)))}>{hour}</div>
         
       </div>)
   }
@@ -66,7 +69,7 @@ export default function DayCalendar() {
         )}
         <div className="grid grid-cols-1 border-gray-300 mx-auto">
           {hours.map((hour) => (
-            <Hour hour={hour}/>
+            <Hour hour={hour} key={hour}/>
           ))}
         </div>
         

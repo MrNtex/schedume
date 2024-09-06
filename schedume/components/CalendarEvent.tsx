@@ -1,9 +1,10 @@
+import { useDashboard } from '@/app/dashboard/page';
 import { useAuth } from '@/context/AuthContext';
-import { Event, EventType, useSchedule } from '@/context/ScheduleContext';
+import { ScheduleEvent, EventType, useSchedule } from '@/context/ScheduleContext';
 import React, { useState, useRef, useEffect } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
-export default function CalendarEvent({ event, partial }: { event: Event, partial: boolean }) {
+export default function CalendarEvent({ event, partial }: { event: ScheduleEvent, partial: boolean }) {
   const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -11,7 +12,8 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
   const eventRef = useRef<HTMLDivElement>(null); // Reference to the draggable element
 
   const { userEventTypes } = useAuth();
-  const { UpdateEvent, setNewEventData, setCreatingEvent } = useSchedule();
+  const { UpdateEvent, setNewEventData } = useSchedule();
+  const { creatingEvent, setCreatingEvent } = useDashboard();
 
   
   const [tempEvent, setTempEvent] = useState(event);
@@ -218,6 +220,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
     
   return (
     <DraggableCore
+      nodeRef={eventRef} // Reference to the draggable element
       onStart={(e) => handleStartDrag(e)} // Start dragging
       onDrag={(e, data) => handleDrag(data, e)} // Handle continuous dragging
       onStop={(e, data) => handleStop()} // Finalize and log the position when dragging stops
@@ -237,6 +240,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
           onStart={(e, data) => handleStartResize('top', e, data)}
           onDrag={(e, data) => handleResize('top',e, data)}
           onStop={handleResizeStop}
+          nodeRef={eventRef}
         >
           <div className="absolute top-0 left-0 w-full h-3 cursor-ns-resize hover:bg-black hover:bg-opacity-45 rounded-t-xl transition ease-in-out"></div>
         </DraggableCore>
@@ -254,6 +258,7 @@ export default function CalendarEvent({ event, partial }: { event: Event, partia
           onStart={(e, data) => handleStartResize('bottom', e, data)}
           onDrag={(e, data) => handleResize('bottom', e, data)}
           onStop={handleResizeStop}
+          nodeRef={eventRef}
         >
           <div className="absolute bottom-0 left-0 w-full h-3 cursor-ns-resize hover:bg-black hover:bg-opacity-45 rounded-b-xl transition ease-in-out"></div>
         </DraggableCore>

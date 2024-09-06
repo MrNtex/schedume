@@ -3,6 +3,7 @@ import { FloatingDock } from "@/components/ui/floating-dock";
 import {
   IconBrandGithub,
   IconBrandX,
+  IconCalendar,
   IconExchange,
   IconHome,
   IconNewSection,
@@ -11,9 +12,11 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { useSchedule } from "@/context/ScheduleContext";
+import { useDashboard } from "@/app/dashboard/page";
 
 export function DashboardFloatingDock() {
-  const { events, addEvent, removeEvent, loading, createEvent, newEventData } = useSchedule();
+  const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
+  const { CreateEvent } = useDashboard();
 
   const links = [
     {
@@ -21,7 +24,7 @@ export function DashboardFloatingDock() {
       icon: (
         <IconNewSection className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      onClick: () => { createEvent() }
+      onClick: () => { CreateEvent() }
     },
 
     {
@@ -32,9 +35,9 @@ export function DashboardFloatingDock() {
       href: "#",
     },
     {
-      title: "Components",
+      title: "Go to Date",
       icon: (
-        <IconNewSection className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <IconCalendar className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
       href: "#",
     },
