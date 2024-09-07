@@ -10,6 +10,8 @@ import { EventPeriod, ScheduleProvider, useSchedule } from '@/context/ScheduleCo
 import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
+import { Calendar } from '@/components/ui/calendar'
+import { DatePicker } from '@/components/DatePicker'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -60,7 +62,7 @@ function MainContent() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState<Date>(new Date());
 
   function CreateEvent(event?: ScheduleEvent) {
     console.log('Creating event')
@@ -81,9 +83,9 @@ function MainContent() {
 
 const CurrentDate = () => {
   return (
-    <div className="flex items-center justify-center">
-      <div className="text-2xl font-bold">{date.toLocaleDateString()}</div>
-      <button onClick={() => setIsChangingDate(true)} className="ml-4 bg-gray-200 px-2 rounded">Change Date</button>
+    <div className='sm:justify-normal px-8 sm:text-left justify-center text-center top-24 sticky'>
+      <div className="text-2xl font-bold  hover:bg-emerald-600">{date.toLocaleDateString()}</div>
+      {date.getDate() === new Date().getDate() && (<p className='italic'>AKA Today</p>)}
     </div>
   )
 }
