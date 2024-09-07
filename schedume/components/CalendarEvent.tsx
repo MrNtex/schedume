@@ -192,14 +192,14 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     {
       return userEventTypes[event.EventTypeID].color;
     }
-    return 'bg-emerald-500';
+    return '#10b981';
   }
 
   const EventInsides = () => {
     if(getHeight() > 5)
     {
       return (
-        <div className="flex justify-between left-0">
+        <div className="flex justify-between left-0 bg-emerald-500">
           <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
           <h1 className="text-white text-lg p-4">
             {getTime()}

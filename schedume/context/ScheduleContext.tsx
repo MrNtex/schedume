@@ -20,7 +20,12 @@ export const DefaultEvents: EventType[] = [
     { id:'2', name: 'Excercise', color: '#0000FF' },
     { id:'3', name: 'Liesure', color: '#FFFF00' },
 ]
-
+export enum EventPeriod {
+    EveryDay,
+    Weekday,
+    WeekRange,
+    Custom
+}
 export class ScheduleEvent {
     id: string = '';
     title: string = '';
@@ -34,7 +39,12 @@ export class ScheduleEvent {
 
     connectedEvent?: ScheduleEvent; // Primary used for events that are during the night and go into the next day
 
+    period: EventPeriod = EventPeriod.EveryDay;
+    weekdays?: boolean[] = [false, false, false, false, false, false, false]; // Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday 
+    dateRange?: [Date, Date] = [new Date(), new Date()]; // Start and end date
+
     constructor(hour: number, minute: number = 0) {
+        this.title = '';
         this.hour = hour;
         this.minute = minute;
     }
@@ -69,7 +79,7 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
 
     UpdateEvent: async () => {},
 
-    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: ''},
+    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]},
     setNewEventData: () => {},
 
     debug: () => {},
@@ -88,9 +98,6 @@ export function ScheduleProvider(props: { children: any }) {
     const [loading, setLoading] = React.useState(true)
 
     const [newEventData, setNewEventData] = React.useState<ScheduleEvent>()
-    useEffect(() => {
-        console.log('new event data:', newEventData)
-    }, [newEventData])
 
     function isFiniteNumber(value: any): boolean {
         // Check if the value is a finite number

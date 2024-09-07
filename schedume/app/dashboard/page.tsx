@@ -6,7 +6,7 @@ import { EventCreator } from '@/components/EventCreator/EventCreator'
 import Login from '@/components/Login'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useAuth } from '@/context/AuthContext'
-import { ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
+import { EventPeriod, ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
 import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
@@ -66,13 +66,14 @@ function MainContent() {
     setCreatingEvent(true)
 
     setNewEventData({
-        title: event?.title || 'New Event',
+        title: event?.title || '',
         description: event?.description || '',
         hour: event?.hour || 12,
         minute: event?.minute || 0,
         duration: event?.duration || 60,
         id: '',
         EventTypeID: event?.EventTypeID || -1,
+        period: event?.period || EventPeriod.EveryDay,
     })
 }
 

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { useSchedule } from "@/context/ScheduleContext"
+import { EventPeriod, useSchedule } from "@/context/ScheduleContext"
 import TimeInput from "../TimeInput"
 
 import EventCreatorAdvanced from "./EventCreatorAdvanced"
@@ -23,7 +23,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useDashboard } from "@/app/dashboard/page"
 
 export interface AdvancedData {
-  period?: string
+  period?: EventPeriod
   description: string
   duration: number
 }
@@ -83,7 +83,8 @@ export function EventCreator() {
         minute: parseInt(minute),
         duration: advancedData.duration,
         id: newEventData.id,
-        EventTypeID: eventTypeID
+        EventTypeID: eventTypeID,
+        period: advancedData.period || EventPeriod.EveryDay,
       })
     }else{
       addEvent({
@@ -93,7 +94,8 @@ export function EventCreator() {
         minute: parseInt(minute),
         duration: 60,
         id: "",
-        EventTypeID: eventTypeID
+        EventTypeID: eventTypeID,
+        period: advancedData.period || EventPeriod.EveryDay,
       })
     }
     
@@ -164,7 +166,7 @@ export function EventCreator() {
                 </div>
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Name of your event" onChange={(e) => setEventName(e.target.value)}/>
+                  <Input id="name" defaultValue={eventName} placeholder="Name of your event" onChange={(e) => setEventName(e.target.value)}/>
                 </div>
                 
               </div>
