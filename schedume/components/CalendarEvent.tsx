@@ -199,7 +199,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     if(getHeight() > 5)
     {
       return (
-        <div className="flex justify-between left-0 bg-emerald-500">
+        <div className="flex justify-between left-0">
           <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
           <h1 className="text-white text-lg p-4">
             {getTime()}
@@ -227,7 +227,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     >
       <div
         ref={eventRef} // Reference to the draggable element
-        className={`absolute rounded-xl px-5 w-[40%] 'bg-emerald-500 ${isDragging && 'brightness-50'}`}
+        className={`absolute rounded-xl px-5 w-[40%] '${isDragging && 'brightness-50'}`}
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,

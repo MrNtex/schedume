@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CalendarEvent from './CalendarEvent';
-import { useSchedule } from '@/context/ScheduleContext';
+import { EventPeriod, useSchedule } from '@/context/ScheduleContext';
 import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
 
@@ -27,6 +27,8 @@ export default function DayCalendar() {
     return () => clearInterval(interval);
   }, []);
 
+  const [date, setDate] = useState(new Date());
+
 
   const Hour = ({ hour }: { hour: string }) => {
     return (
@@ -39,13 +41,45 @@ export default function DayCalendar() {
     return <div>Loading...</div>;
   }
 
+  function ValidateEvent(event: ScheduleEvent) {
+    if (event.id === '' || event.id == null) {
+      console.log('Invalid Event ID');
+      removeEvent(event.id); // it will remove all events with invalid id
+      return false;
+    }
+
+    switch (event.period) {
+      case EventPeriod.EveryDay:
+        return true;
+      case EventPeriod.Weekday:
+      case EventPeriod.WeekRange:
+        if (event.weekdays == null) {
+          console.log('Invalid Event Weekdays');
+          return false;
+        }
+        return event.weekdays[date.getDay()];
+      case EventPeriod.Custom:
+        if (event.dateRange == null) {
+          console.log('Invalid Event DateRange');
+          return false;
+        }
+        return date >= event.dateRange[0] && date <= event.dateRange[1];
+    }
+
+    return true;
+  }
+
   const Events = () => {
-    return events.map((event) => (
-      <React.Fragment key={event.id}>
-        <CalendarEvent event={event} partial={false}/>
-        {event.hour * 60 + event.minute + event.duration > 24 * 60 && <CalendarEvent event={event} partial={true}/>}
-      </React.Fragment>
-    ));
+    return events
+      .filter((event) => ValidateEvent(event))
+      .map((event) => (
+        <React.Fragment key={event.id}>
+          <CalendarEvent event={event} partial={false} />
+          {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
+            <CalendarEvent event={event} partial={true} />
+          )}
+        </React.Fragment>
+      ));
 
   }
 

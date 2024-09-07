@@ -24,6 +24,8 @@ import { useDashboard } from "@/app/dashboard/page"
 
 export interface AdvancedData {
   period?: EventPeriod
+  weekdays?: boolean[]
+  dateRange?: Date[]
   description: string
   duration: number
 }
@@ -40,8 +42,10 @@ export function EventCreator() {
   const { userEventTypes } = useAuth()
   
   const [advancedData, setAdvancedData] = React.useState<AdvancedData>({
-    description: '',
-    duration: 60
+    description: newEventData?.description || '',
+    duration: newEventData?.duration || 60,
+    period: newEventData?.period || EventPeriod.EveryDay,
+    weekdays: newEventData?.weekdays || [true, true, true, true, true, true, true],
   })
 
   const ShareAdvancedData = (data: AdvancedData) => {
@@ -85,6 +89,7 @@ export function EventCreator() {
         id: newEventData.id,
         EventTypeID: eventTypeID,
         period: advancedData.period || EventPeriod.EveryDay,
+        weekdays: advancedData.weekdays, 
       })
     }else{
       addEvent({
@@ -96,6 +101,7 @@ export function EventCreator() {
         id: "",
         EventTypeID: eventTypeID,
         period: advancedData.period || EventPeriod.EveryDay,
+        weekdays: advancedData.weekdays,
       })
     }
     

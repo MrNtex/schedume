@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { useAuth } from "./AuthContext";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
-import { create } from "domain";
+import { useToast } from '@/components/ui/use-toast'
 
 export interface EventType {
     id: string;
@@ -99,6 +99,8 @@ export function ScheduleProvider(props: { children: any }) {
 
     const [newEventData, setNewEventData] = React.useState<ScheduleEvent>()
 
+    const { toast } = useToast()
+
     function isFiniteNumber(value: any): boolean {
         // Check if the value is a finite number
         return typeof value === 'number' && Number.isFinite(value);
@@ -119,6 +121,9 @@ export function ScheduleProvider(props: { children: any }) {
         }
         if(!isFiniteNumber(event.duration) || event.duration <= 0 || event.duration > 24 * 60) {
             event.duration = 60
+            toast({
+                title: "Uh oh! Something went wrong.",
+                description: "Invalid duration.",})
         }
     }
     useEffect(() => {

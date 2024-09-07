@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import * as Slider from '@radix-ui/react-slider';
 
 // Array of days of the week
@@ -7,15 +7,15 @@ const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sat
 type WeekRangeSelectorProps = {
   day1: number;
   day2: number;
+  updateRange: (range: number[]) => void;
 };
 
-export default function WeekRangeSelector({ day1, day2 }: WeekRangeSelectorProps) {
+export default function WeekRangeSelector({ day1, day2, updateRange }: WeekRangeSelectorProps) {
   const [range, setRange] = useState([day1, day2]); // Initial range from Monday to Friday
+  useEffect(() => {
+    updateRange(range);
+  }, [range]);
 
-  // Handler for slider change
-  const handleChange = (newRange: React.SetStateAction<number[]>) => {
-    setRange(newRange);
-  };
 
   const selectedRange = () => {
     if (range[0] === range[1]) {
@@ -33,7 +33,7 @@ export default function WeekRangeSelector({ day1, day2 }: WeekRangeSelectorProps
         min={0}
         max={6}
         step={1}
-        onValueChange={handleChange}
+        onValueChange={setRange}
         aria-label="Select range of days"
       >
         <Slider.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
