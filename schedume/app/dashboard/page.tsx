@@ -60,6 +60,8 @@ function MainContent() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
 
+  const [date, setDate] = useState(new Date());
+
   function CreateEvent(event?: ScheduleEvent) {
     console.log('Creating event')
 
@@ -77,6 +79,15 @@ function MainContent() {
     })
 }
 
+const CurrentDate = () => {
+  return (
+    <div className="flex items-center justify-center">
+      <div className="text-2xl font-bold">{date.toLocaleDateString()}</div>
+      <button onClick={() => setIsChangingDate(true)} className="ml-4 bg-gray-200 px-2 rounded">Change Date</button>
+    </div>
+  )
+}
+
   const value = {
     creatingEvent,
     setCreatingEvent,
@@ -87,6 +98,9 @@ function MainContent() {
   
   return (
     <DashboardContext.Provider value={value}>
+      <CurrentDate/>
+
+
       {creatingEvent && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <EventCreator />

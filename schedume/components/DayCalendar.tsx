@@ -44,7 +44,7 @@ export default function DayCalendar() {
   function ValidateEvent(event: ScheduleEvent) {
     if (event.id === '' || event.id == null) {
       console.log('Invalid Event ID');
-      removeEvent(event.id); // it will remove all events with invalid id
+      //removeEvent(event.id); // it will remove all events with invalid id
       return false;
     }
 

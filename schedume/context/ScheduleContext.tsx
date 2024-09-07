@@ -172,6 +172,7 @@ export function ScheduleProvider(props: { children: any }) {
         ValidateEvent(event)
 
         const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
+        await updateDoc(docRef, { id: docRef.id });
         setEvents(prevEvents => [...prevEvents, { ...event, id: docRef.id }])
 
         console.log('Event added:', event)
