@@ -4,6 +4,7 @@ import { EventPeriod, useSchedule } from '@/context/ScheduleContext';
 import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
 import { useDayContext } from '@/context/DayContext';
+import HourOnDayCalendar from './HourOnDayCalendar';
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
@@ -13,14 +14,12 @@ export default function DayCalendar() {
   const { CreateEvent, date } = useDashboard();
   const { wakeUpTime } = useDayContext();
 
-  const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      setCurrentTime(`${hours}:${minutes < 10 ? '0' + minutes : minutes}`);
+      setCurrentTime(now);
     };
 
     updateTime();
@@ -88,25 +87,8 @@ export default function DayCalendar() {
       <div className=" relative w-[60%]">
         <Events />
         {/* Current Time Line */}
-        {currentTime && (
-          <div
-            className="absolute left-0 right-0 h-0.5 bg-red-500 mx-auto"
-            style={{
-              top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / (24 * 60) * 100}%`,
-
-            }}
-          >
-            <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
-              {currentTime}
-            </span>
-            {wakeUpTime && (
-              <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
-                {`${wakeUpTime.getHours()}:${wakeUpTime.getMinutes() < 10 ? '0' + wakeUpTime.getMinutes() : wakeUpTime.getMinutes()}`}
-              </span>
-              )}
-            
-          </div>
-        )}
+        <HourOnDayCalendar date={currentTime} />
+        <HourOnDayCalendar date={wakeUpTime} />
         <div className="grid grid-cols-1 border-gray-300 mx-auto">
           {hours.map((hour) => (
             <Hour hour={hour} key={hour}/>

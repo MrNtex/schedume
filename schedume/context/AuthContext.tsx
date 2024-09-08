@@ -108,45 +108,55 @@ export function AuthProvider(props: { children: any }) {
 
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async user => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
-        setLoading(true)
-        setUser(user)
-        if(!user){
-          console.log('User is not logged in')
-          return
+        setLoading(true);
+        setUser(user);
+        if (!user) {
+          console.log('User is not logged in');
+          return;
         }
-
-        // if user is logged in, get user data from firestore
-        const docRef = doc(db, 'users', user.uid)
-        const docSnap = await getDoc(docRef)
-        let firebaseData = {}
-        if(docSnap.exists()){
-          console.log('Found user data:')
-          firebaseData = docSnap.data()
+  
+        // if user is logged in, get user data from Firestore
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        let firebaseData = {};
+        if (docSnap.exists()) {
+          console.log('Found user data:');
+          const data = docSnap.data();
+  
+          // Convert Firestore Timestamps to Date objects
+          const lastLogin = data.lastLogin ? data.lastLogin.toDate() : null;
+          const wakeUpTime = data.wakeUpTime ? data.wakeUpTime.toDate() : null;
+  
+          // Assign the converted dates back to the firebaseData object
+          firebaseData = {
+            ...data,
+            lastLogin,
+            wakeUpTime,
+          };
         }
-        setUserDataObj(firebaseData as UserData)
-        console.log(userDataObj)
-
-        // get user event types
-        const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types')
-        const eventsTypesSnapshot = await getDocs(eventsTypesCollection)
-
+        setUserDataObj(firebaseData as UserData);
+        console.log(userDataObj);
+  
+        const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types');
+        const eventsTypesSnapshot = await getDocs(eventsTypesCollection);
+  
         const userEventTypes = eventsTypesSnapshot.docs.reduce((types: Record<string, any>, doc) => {
           types[doc.id] = { id: doc.id, ...doc.data() };
           return types;
         }, {});
-        setUserEventTypes(userEventTypes)
+        setUserEventTypes(userEventTypes);
       } catch (err: any) {
-        console.log(err.message)
+        console.log(err.message);
       } finally {
-        setLoading(false)
-        console.log('Loading done')
-        console.log(userDataObj)
+        setLoading(false);
+        console.log('Loading done');
+        console.log(userDataObj);
       }
-    })
-    return unsubscribe
-  }, [])
+    });
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {

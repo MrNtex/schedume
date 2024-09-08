@@ -27,18 +27,17 @@ export function useDayContext() {
 export default function DayContextProvider(props: { children: any }) {
     const { user, userDataObj, setUserDataObj } = useAuth()
 
-    const [wakeUpTime, setWakeUpTime] = React.useState(new Date())
-    const [lastLogin, setLastLogin] = React.useState(new Date())
+    const [wakeUpTime, setWakeUpTime] = React.useState<Date>(userDataObj?.wakeUpTime || new Date())
+    const [lastLogin, setLastLogin] = React.useState<Date>(new Date())
     const [loading, setLoading] = React.useState(true)
 
     useEffect(() => {
+        setWakeUpTime(userDataObj?.wakeUpTime || new Date())
+
         if (userDataObj == null) {
             setWakeUpTime(new Date()) // Clear events if user is not logged in
             return
         }
-        
-        console.log('Fetching wake up time')
-        console.log(userDataObj)
 
         setUserDataObj({ ...userDataObj, wakeUpTime: wakeUpTime, lastLogin: lastLogin })
     }, [user])
