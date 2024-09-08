@@ -15,7 +15,7 @@ export default function EventCreatorAdvanced({
     ShareAdvancedData: (data: AdvancedData) => void;
 }) {
     
-  const [period, setPeriod] = React.useState(EventPeriod.EveryDay)
+  const [period, setPeriod] = React.useState(data.period)
   useEffect(() => {
     ShareAdvancedData({...data, period: period})
   }, [period])
@@ -69,7 +69,7 @@ export default function EventCreatorAdvanced({
 
         {period === EventPeriod.Custom && <DatePickerWithRange/>}
         {period === EventPeriod.WeekRange && <WeekRangeSelector day1={0} day2={4} updateRange={setSelectedWeekdays}/>}
-        {period === EventPeriod.Weekday && <WeekRangeSelector day1={new Date().getDay()-1} day2={new Date().getDay()-1} updateRange={setSelectedWeekdays}/>}
+        {period === EventPeriod.Weekday && <WeekRangeSelector day1={(new Date().getDay()+6)%7} day2={(new Date().getDay()+6)%7} updateRange={setSelectedWeekdays}/>}
         
         <Label>Duration</Label>
         <Input id="duration" placeholder="60" onChange={(e) => ShareAdvancedData({...data, duration: parseInt(e.target.value)})}/>

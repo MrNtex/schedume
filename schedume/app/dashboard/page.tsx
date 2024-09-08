@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
 import { Calendar } from '@/components/ui/calendar'
 import { DatePicker } from '@/components/DatePicker'
+import DatePickerModal from '@/components/DatePickerModal'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -43,6 +44,8 @@ interface DashboardContextType {
   changingDate: boolean
   setChangingDate: (value: boolean) => void;
   CreateEvent: (event?: ScheduleEvent) => void;
+  date: Date;
+  setDate: (date: Date) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -51,6 +54,8 @@ const DashboardContext = React.createContext<DashboardContextType>({
   changingDate: false,
   setChangingDate: () => {},
   CreateEvent: () => {},
+  date: new Date(),
+  setDate: () => {},
 })
 
 
@@ -79,16 +84,18 @@ function MainContent() {
         EventTypeID: event?.EventTypeID || -1,
         period: event?.period || EventPeriod.EveryDay,
     })
-}
+  }
 
-const CurrentDate = () => {
-  return (
-    <div className='sm:justify-normal px-8 sm:text-left justify-center text-center top-24 sticky'>
-      <div className="text-2xl font-bold  hover:bg-emerald-600">{date.toLocaleDateString()}</div>
-      {date.getDate() === new Date().getDate() && (<p className='italic'>AKA Today</p>)}
-    </div>
-  )
-}
+  const CurrentDate = () => {
+    return (
+      <aside className='sm:justify-normal px-8 sm:text-left justify-center text-center top-24 sticky w-[20%]'>
+        <h1 className="inline text-2xl font-bold  hover:bg-emerald-600 rounded-lg transition ease-in-out items-center">
+          <span className="px-2">{date.toLocaleDateString()}</span>
+        </h1>
+        {date.getDate() === new Date().getDate() && (<p className='italic px-2'>AKA Today</p>)}
+      </aside>
+    )
+  }
 
   const value = {
     creatingEvent,
@@ -96,6 +103,8 @@ const CurrentDate = () => {
     changingDate: isChangingDate,
     setChangingDate: setIsChangingDate,
     CreateEvent,
+    date,
+    setDate,
   }
   
   return (
@@ -108,7 +117,11 @@ const CurrentDate = () => {
           <EventCreator />
         </div>
       )}
-
+      {isChangingDate && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <DatePickerModal />
+        </div>
+      )}
       
       <DayCalendar />
       <DashboardFloatingDock />

@@ -9,7 +9,7 @@ const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 export default function DayCalendar() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent } = useDashboard();
+  const { CreateEvent, date } = useDashboard();
 
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -26,8 +26,6 @@ export default function DayCalendar() {
 
     return () => clearInterval(interval);
   }, []);
-
-  const [date, setDate] = useState(new Date());
 
 
   const Hour = ({ hour }: { hour: string }) => {
@@ -57,7 +55,7 @@ export default function DayCalendar() {
           console.log('Invalid Event Weekdays');
           return false;
         }
-        return event.weekdays[date.getDay()];
+        return event.weekdays[(date.getDay()+6)%7];
       case EventPeriod.Custom:
         if (event.dateRange == null) {
           console.log('Invalid Event DateRange');

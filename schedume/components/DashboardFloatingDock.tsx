@@ -16,7 +16,7 @@ import { useDashboard } from "@/app/dashboard/page";
 
 export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent } = useDashboard();
+  const { CreateEvent, setChangingDate } = useDashboard();
 
   const links = [
     {
@@ -39,7 +39,7 @@ export function DashboardFloatingDock() {
       icon: (
         <IconCalendar className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      onClick: () => { setChangingDate(true) }
     },
     {
       title: "Changelog",
