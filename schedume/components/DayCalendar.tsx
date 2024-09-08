@@ -3,6 +3,7 @@ import CalendarEvent from './CalendarEvent';
 import { EventPeriod, useSchedule } from '@/context/ScheduleContext';
 import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
+import { useDayContext } from '@/context/DayContext';
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
@@ -10,6 +11,7 @@ const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 export default function DayCalendar() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
   const { CreateEvent, date } = useDashboard();
+  const { wakeUpTime } = useDayContext();
 
   const [currentTime, setCurrentTime] = useState<string>('');
 
@@ -97,6 +99,12 @@ export default function DayCalendar() {
             <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
               {currentTime}
             </span>
+            {wakeUpTime && (
+              <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
+                {`${wakeUpTime.getHours()}:${wakeUpTime.getMinutes() < 10 ? '0' + wakeUpTime.getMinutes() : wakeUpTime.getMinutes()}`}
+              </span>
+              )}
+            
           </div>
         )}
         <div className="grid grid-cols-1 border-gray-300 mx-auto">

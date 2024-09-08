@@ -3,12 +3,23 @@
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
 import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, use} from 'react'
 import { DefaultEvents } from './ScheduleContext'
+
+interface UserData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  uid: string;
+
+  lastLogin: Date;
+  wakeUpTime: Date;
+}
 
 interface AuthContextType {
   user: User | null;
-  userDataObj: any;
+  userDataObj: UserData | null;
+  setUserDataObj: (data: UserData) => void;
   userEventTypes: any;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
@@ -18,7 +29,8 @@ interface AuthContextType {
 
 const defaultAuthContext: AuthContextType = {
   user: null,
-  userDataObj: {},
+  userDataObj: null,
+  setUserDataObj: () => {},
   userEventTypes: {},
   signup: async () => {},
   login: async () => {},
@@ -35,7 +47,7 @@ export function useAuth() {
 export function AuthProvider(props: { children: any }) {
 
   const [user, setUser] = useState<User | null>(null)
-  const [userDataObj, setUserDataObj] = useState({})
+  const [userDataObj, setUserDataObj] = useState<UserData | null>(null)
   const [userEventTypes, setUserEventTypes] = useState<Record<string, any>>({})
   const [loading, setLoading] = useState(true)
 
@@ -88,7 +100,7 @@ export function AuthProvider(props: { children: any }) {
   }
 
   function logout() {
-    setUserDataObj({})
+    setUserDataObj(null)
     setUser(null)
 
     return auth.signOut()
@@ -113,7 +125,8 @@ export function AuthProvider(props: { children: any }) {
           console.log('Found user data:')
           firebaseData = docSnap.data()
         }
-        setUserDataObj(firebaseData)
+        setUserDataObj(firebaseData as UserData)
+        console.log(userDataObj)
 
         // get user event types
         const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types')
@@ -128,13 +141,32 @@ export function AuthProvider(props: { children: any }) {
         console.log(err.message)
       } finally {
         setLoading(false)
+        console.log('Loading done')
+        console.log(userDataObj)
       }
     })
     return unsubscribe
   }, [])
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!user) {
+          return
+        }
+        const docRef = doc(db, 'users', user.uid)
+        setDoc(docRef, userDataObj)
+      }
+      catch (err: any) {
+        console.log(err.message)
+      }
+    }
+    fetchUserData()
+  }, [userDataObj])
   const value: AuthContextType = {
     user,
     userDataObj,
+    setUserDataObj,
     userEventTypes,
     signup,
     login,

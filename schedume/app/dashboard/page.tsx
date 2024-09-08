@@ -13,6 +13,7 @@ import { ScheduleEvent } from '@/context/ScheduleContext'
 import { Calendar } from '@/components/ui/calendar'
 import { DatePicker } from '@/components/DatePicker'
 import DatePickerModal from '@/components/DatePickerModal'
+import DayContextProvider from '@/context/DayContext'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -33,7 +34,9 @@ export default function Page() {
 
   return (
     <ScheduleProvider>
+    <DayContextProvider>
       <MainContent />
+    </DayContextProvider>
     </ScheduleProvider>
   );
 }
