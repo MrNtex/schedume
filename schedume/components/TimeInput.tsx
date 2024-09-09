@@ -5,22 +5,26 @@ import { Button } from './ui/button';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
 interface TimeInputProps {
-    event?: ScheduleEvent;
+    defaultHour?: number;
+    defaultMinute?: number;
     onHourChange: (hour: string) => void;
     onMinuteChange: (minute: string) => void;
   }
   
 
 export default function TimeInput({
-    event,
+    defaultHour,
+    defaultMinute,
     onHourChange,
     onMinuteChange,
 }: TimeInputProps) 
 { // Update the type of the event parameter
-  let defaultHour = '';
-  if(event) defaultHour = event.hour < 10 ? `0${event.hour}` : event.hour.toString();
-  const [hour, setHour] = useState(defaultHour);
-  const [minute, setMinute] = useState('');
+  if (!defaultHour) defaultHour = 0;
+  let hourString = defaultHour < 10 ? `0${defaultHour}` : defaultHour.toString();
+  const [hour, setHour] = useState(hourString);
+  if (!defaultMinute) defaultMinute = 0;
+  let minuteString = defaultMinute < 10 ? `0${defaultMinute}` : defaultMinute.toString();
+  const [minute, setMinute] = useState(minuteString);
 
   useEffect(() => {
     onHourChange(hour);

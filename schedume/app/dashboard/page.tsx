@@ -14,6 +14,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { DatePicker } from '@/components/DatePicker'
 import DatePickerModal from '@/components/DatePickerModal'
 import DayContextProvider from '@/context/DayContext'
+import WakeUpTimeModal from '@/components/WakeUpTimeModal'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -34,9 +35,7 @@ export default function Page() {
 
   return (
     <ScheduleProvider>
-    <DayContextProvider>
       <MainContent />
-    </DayContextProvider>
     </ScheduleProvider>
   );
 }
@@ -46,6 +45,9 @@ interface DashboardContextType {
   setCreatingEvent: (value: boolean) => void;
   changingDate: boolean
   setChangingDate: (value: boolean) => void;
+  settingWakeUpTime: boolean
+  setSettingWakeUpTime: (value: boolean) => void;
+
   CreateEvent: (event?: ScheduleEvent) => void;
   date: Date;
   setDate: (date: Date) => void;
@@ -56,6 +58,8 @@ const DashboardContext = React.createContext<DashboardContextType>({
   setCreatingEvent: () => {},
   changingDate: false,
   setChangingDate: () => {},
+  settingWakeUpTime: false,
+  setSettingWakeUpTime: () => {},
   CreateEvent: () => {},
   date: new Date(),
   setDate: () => {},
@@ -69,12 +73,14 @@ function MainContent() {
 
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
+  const [settingWakeUpTime, setSettingWakeUpTime] = useState(false);
+  useEffect(() => {
+    console.log(settingWakeUpTime)
+  }, [settingWakeUpTime])
 
   const [date, setDate] = useState<Date>(new Date());
 
   function CreateEvent(event?: ScheduleEvent) {
-    console.log('Creating event')
-
     setCreatingEvent(true)
 
     setNewEventData({
@@ -105,6 +111,8 @@ function MainContent() {
     setCreatingEvent,
     changingDate: isChangingDate,
     setChangingDate: setIsChangingDate,
+    settingWakeUpTime,
+    setSettingWakeUpTime: setSettingWakeUpTime,
     CreateEvent,
     date,
     setDate,
@@ -112,22 +120,29 @@ function MainContent() {
   
   return (
     <DashboardContext.Provider value={value}>
+      <DayContextProvider>
       <CurrentDate/>
 
+        {settingWakeUpTime && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <WakeUpTimeModal />
+          </div>
+        )}
+        {creatingEvent && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <EventCreator />
+          </div>
+        )}
+        {isChangingDate && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <DatePickerModal />
+          </div>
+        )}
 
-      {creatingEvent && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <EventCreator />
-        </div>
-      )}
-      {isChangingDate && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <DatePickerModal />
-        </div>
-      )}
+        <DayCalendar />
+        <DashboardFloatingDock />
+      </DayContextProvider>
       
-      <DayCalendar />
-      <DashboardFloatingDock />
     </DashboardContext.Provider>
   );
 }

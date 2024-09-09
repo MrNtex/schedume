@@ -34,8 +34,8 @@ export function EventCreator() {
   const { creatingEvent, setCreatingEvent } = useDashboard()
 
   const [eventName, setEventName] = React.useState(newEventData?.title || '')
-  const [hour, setHour] = React.useState(newEventData?.hour.toString() || '')
-  const [minute, setMinute] = React.useState(newEventData?.minute.toString() || '')
+  const [hour, setHour] = React.useState(newEventData?.hour || 0)
+  const [minute, setMinute] = React.useState(newEventData?.minute || 0)
 
   const [eventTypeID, setEventTypeID] = React.useState(newEventData?.EventTypeID || -1) // -1 means no type selected
 
@@ -66,11 +66,11 @@ export function EventCreator() {
 
     if(!hour)
     {
-      setHour('00')
+      setHour(0)
     }
     if(!minute)
     {
-      setMinute('00')
+      setMinute(0)
     }
 
     if(!eventName)
@@ -83,8 +83,8 @@ export function EventCreator() {
       UpdateEvent({
         title: eventName,
         description: '',
-        hour: parseInt(hour),
-        minute: parseInt(minute),
+        hour: hour,
+        minute: minute,
         duration: advancedData.duration,
         id: newEventData.id,
         EventTypeID: eventTypeID,
@@ -95,8 +95,8 @@ export function EventCreator() {
       addEvent({
         title: eventName,
         description: '',
-        hour: parseInt(hour),
-        minute: parseInt(minute),
+        hour: hour,
+        minute: minute,
         duration: 60,
         id: "",
         EventTypeID: eventTypeID,
@@ -165,7 +165,7 @@ export function EventCreator() {
                 <div>
                   <Label htmlFor="time">Time</Label>
                   <div className="flex justify-center">
-                    <TimeInput event={newEventData} onHourChange={(s: string) => setHour(s)} onMinuteChange={(s: string) => setMinute(s)}/>
+                    <TimeInput defaultHour={hour} defaultMinute={minute} onHourChange={(s: string) => setHour(parseInt(s))} onMinuteChange={(s: string) => setMinute(parseInt(s))}/>
                   </div>
                   
                   

@@ -69,7 +69,27 @@ export default function DayCalendar() {
   }
 
   const Events = () => {
-    return events
+    let fixedEvents: ScheduleEvent[] = []
+    let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
+
+    events.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+
+    events.forEach(element => {
+      let startTime = element.hour * 60 + element.minute;
+      if (startTime > endTime) {
+        fixedEvents.push(element);
+        endTime = startTime + element.duration;
+      }
+      else {
+        element.hour = Math.floor(endTime / 60);
+        element.minute = endTime % 60;
+        fixedEvents.push(element);
+        endTime = startTime + element.duration;
+      }
+      console.log(element);
+    });
+
+    return fixedEvents
       .filter((event) => ValidateEvent(event))
       .map((event) => (
         <React.Fragment key={event.id}>
