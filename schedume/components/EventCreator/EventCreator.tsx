@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { EventPeriod, useSchedule } from "@/context/ScheduleContext"
+import { EventPeriod, ScheduleEvent, useSchedule } from "@/context/ScheduleContext"
 import TimeInput from "../TimeInput"
 
 import EventCreatorAdvanced from "./EventCreatorAdvanced"
@@ -33,82 +33,22 @@ export function EventCreator() {
   const { addEvent, newEventData, UpdateEvent, removeEvent } = useSchedule()
   const { creatingEvent, setCreatingEvent } = useDashboard()
 
-  const [eventName, setEventName] = React.useState(newEventData?.title || '')
-  const [hour, setHour] = React.useState(newEventData?.hour || 0)
-  const [minute, setMinute] = React.useState(newEventData?.minute || 0)
-
-  const [eventTypeID, setEventTypeID] = React.useState(newEventData?.EventTypeID || -1) // -1 means no type selected
-
   const { userEventTypes } = useAuth()
-  
-  const [advancedData, setAdvancedData] = React.useState<AdvancedData>({
-    description: newEventData?.description || '',
-    duration: newEventData?.duration || 60,
-    period: newEventData?.period || EventPeriod.EveryDay,
-    weekdays: newEventData?.weekdays || [true, true, true, true, true, true, true],
-  })
 
-  const ShareAdvancedData = (data: AdvancedData) => {
-    setAdvancedData(data)
-  }
-
-  function handleValueChange(id: number) {
-    if(id in userEventTypes)
-    {
-      setEventTypeID(id)
-      return
-    }
-    setEventTypeID(-1);
-  }
+  const [ newEventDataLocal, setNewEventDataLocal ] = React.useState<ScheduleEvent>(newEventData || {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: 0, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]})
 
   function handleCreateEvent() {
     setCreatingEvent(false)
 
-    if(!hour)
-    {
-      setHour(0)
-    }
-    if(!minute)
-    {
-      setMinute(0)
-    }
-
-    if(!eventName)
-    {
-      setEventName('New Event')
-    }
-
     if(newEventData?.id)
     {
-      UpdateEvent({
-        title: eventName,
-        description: '',
-        hour: hour,
-        minute: minute,
-        duration: advancedData.duration,
-        id: newEventData.id,
-        eventPriority: newEventData?.eventPriority || 0,
-        EventTypeID: eventTypeID,
-        period: advancedData.period || EventPeriod.EveryDay,
-        weekdays: advancedData.weekdays, 
-      })
+      UpdateEvent(newEventDataLocal)
     }else{
-      addEvent({
-        title: eventName,
-        description: '',
-        hour: hour,
-        minute: minute,
-        duration: 60,
-        id: "",
-        EventTypeID: eventTypeID,
-        eventPriority: newEventData?.eventPriority || 0,
-        period: advancedData.period || EventPeriod.EveryDay,
-        weekdays: advancedData.weekdays,
-      })
+      addEvent(newEventDataLocal)
     }
     
 
-    console.log('Event created:', eventName, hour, minute)
+    console.log('Event created:', newEventDataLocal)
   }
 
   function handleDeleteEvent() {
@@ -167,23 +107,23 @@ export function EventCreator() {
                 <div>
                   <Label htmlFor="time">Time</Label>
                   <div className="flex justify-center">
-                    <TimeInput defaultHour={hour} defaultMinute={minute} onHourChange={(s: string) => setHour(parseInt(s))} onMinuteChange={(s: string) => setMinute(parseInt(s))}/>
+                    <TimeInput defaultHour={newEventDataLocal.hour} defaultMinute={newEventDataLocal.minute} onHourChange={(s: string) => setNewEventDataLocal({...newEventDataLocal, hour: parseInt(s)})} onMinuteChange={(s: string) => setNewEventDataLocal({...newEventDataLocal, minute: parseInt(s)})}/>
                   </div>
                   
                   
                 </div>
                 <div className="flex flex-col space-y-1.5">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" defaultValue={eventName} placeholder="Name of your event" onChange={(e) => setEventName(e.target.value)}/>
+                  <Input id="name" defaultValue={newEventDataLocal.title} placeholder="Name of your event" onChange={(e) => setNewEventDataLocal({...newEventDataLocal, title: e.target.value})}/>
                 </div>
                 
               </div>
 
-              <PrioritySelector/>
+              <PrioritySelector event={newEventDataLocal} setEvent={setNewEventDataLocal}/>
 
               <div className="flex flex-col space-y-1.5">
                 <Label>Type</Label>
-                <Select onValueChange={(value) => handleValueChange(parseInt(value))}>
+                <Select onValueChange={(value) => setNewEventDataLocal({...newEventDataLocal, EventTypeID: parseInt(value)})}>
                     <SelectTrigger id="period">
                     <SelectValue placeholder="Select" />
                     </SelectTrigger>
@@ -207,7 +147,7 @@ export function EventCreator() {
           </CardHeader>
           <CardContent>
             <form>
-              <EventCreatorAdvanced data={advancedData} ShareAdvancedData={(data: AdvancedData) => ShareAdvancedData(data)} />
+              <EventCreatorAdvanced event={newEventDataLocal} setEvent={(event: ScheduleEvent) => setNewEventDataLocal(event)} />
             </form>
           </CardContent>
           <Footer/>

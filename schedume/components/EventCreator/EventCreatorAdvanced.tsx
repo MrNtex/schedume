@@ -5,19 +5,19 @@ import { AdvancedData } from './EventCreator'
 import { Input } from '../ui/input';
 import WeekRangeSelector from './WeekRangeSelector';
 import { DatePickerWithRange } from '../ui/datepicker';
-import { EventPeriod } from '@/context/ScheduleContext';
+import { EventPeriod, ScheduleEvent } from '@/context/ScheduleContext';
 
 export default function EventCreatorAdvanced({
-    data,
-    ShareAdvancedData,
+    event,
+    setEvent,
 }: {
-    data: AdvancedData;
-    ShareAdvancedData: (data: AdvancedData) => void;
+    event: ScheduleEvent;
+    setEvent: (event: ScheduleEvent) => void;
 }) {
     
-  const [period, setPeriod] = React.useState(data.period)
+  const [period, setPeriod] = React.useState(event.period)
   useEffect(() => {
-    ShareAdvancedData({...data, period: period})
+    setEvent({...event, period: period})
   }, [period])
   const [selectedWeekdays, setSelectedWeekdays] = React.useState<number[]>([])
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function EventCreatorAdvanced({
       {
         weekdays[i] = true
       }
-      ShareAdvancedData({...data, weekdays: weekdays})
+      setEvent({...event, weekdays: weekdays})
   }, [selectedWeekdays])
 
   const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -72,7 +72,7 @@ export default function EventCreatorAdvanced({
         {period === EventPeriod.Weekday && <WeekRangeSelector day1={(new Date().getDay()+6)%7} day2={(new Date().getDay()+6)%7} updateRange={setSelectedWeekdays}/>}
         
         <Label>Duration</Label>
-        <Input id="duration" placeholder="60" onChange={(e) => ShareAdvancedData({...data, duration: parseInt(e.target.value)})}/>
+        <Input id="duration" placeholder="60" onChange={(e) => setEvent({...event, duration: parseInt(e.target.value)})}/>
     </div>
   )
 }

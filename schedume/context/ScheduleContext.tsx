@@ -30,6 +30,7 @@ export enum EventPriority {
     Low,
     Medium,
     High,
+    Top,
     Fixed
 }
 export class ScheduleEvent {

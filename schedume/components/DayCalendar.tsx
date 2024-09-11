@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CalendarEvent from './CalendarEvent';
-import { EventPeriod, useSchedule } from '@/context/ScheduleContext';
+import { EventPeriod, EventPriority, useSchedule } from '@/context/ScheduleContext';
 import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
 import { useDayContext } from '@/context/DayContext';
@@ -76,6 +76,12 @@ export default function DayCalendar() {
 
     events.forEach(element => {
       let startTime = element.hour * 60 + element.minute;
+      if (element.eventPriority == EventPriority.Fixed){
+        fixedEvents.push(element);
+        endTime = startTime + element.duration;
+        return;
+      }
+      
       if (startTime > endTime) {
         fixedEvents.push(element);
         endTime = startTime + element.duration;
