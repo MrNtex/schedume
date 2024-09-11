@@ -26,6 +26,12 @@ export enum EventPeriod {
     WeekRange,
     Custom
 }
+export enum EventPriority {
+    Low,
+    Medium,
+    High,
+    Fixed
+}
 export class ScheduleEvent {
     id: string = '';
     title: string = '';
@@ -34,6 +40,7 @@ export class ScheduleEvent {
     minute: number = 0;
 
     duration: number = 60; // Duration in minutes
+    eventPriority = EventPriority.Medium;
     
     EventTypeID: number = -1; // -1 means no type selected
 
@@ -79,7 +86,7 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
 
     UpdateEvent: async () => {},
 
-    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]},
+    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: EventPriority.Low, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]},
     setNewEventData: () => {},
 
     debug: () => {},
@@ -159,6 +166,8 @@ export function ScheduleProvider(props: { children: any }) {
         }
 
         fetchEvents();
+
+        console.log('Events:', events)
 
 
     }, [user])

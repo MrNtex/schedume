@@ -1,6 +1,7 @@
 import { useDashboard } from '@/app/dashboard/page';
 import { useAuth } from '@/context/AuthContext';
-import { ScheduleEvent, EventType, useSchedule } from '@/context/ScheduleContext';
+import { ScheduleEvent, EventType, useSchedule, EventPriority } from '@/context/ScheduleContext';
+import { Lock } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
@@ -184,7 +185,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
   const getTime = () => {
     if(isDragging || isResizing)
       return `${tempEvent.hour}:${tempEvent.minute || '00'}-${durationToTime(tempEvent.duration, tempEvent.hour, tempEvent.minute)}`;
-    return `${event.hour}:${event.minute || '00'}`;
+    return `${event.hour}:${(event.minute < 10 ? '0' + event.minute : event.minute) || '00'}`;
   }
 
   const getColor = () => {
@@ -227,7 +228,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     >
       <div
         ref={eventRef} // Reference to the draggable element
-        className={`absolute rounded-xl px-5 w-[40%] '${isDragging && 'brightness-50'}`}
+        className={`absolute rounded-xl px-5 w-[40%] '${event.eventPriority == EventPriority.Fixed && 'border-4 border-emerald-100'}''${isDragging && 'brightness-50'}`}
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,

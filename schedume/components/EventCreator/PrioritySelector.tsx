@@ -1,10 +1,11 @@
 import React from 'react'
 import { Slider } from '../ui/slider'
 import { Label } from '../ui/label'
+import { EventPriority } from '@/context/ScheduleContext';
 
 export default function PrioritySelector() {
 
-  const [priority, setPriority] = React.useState(0);
+  const [priority, setPriority] = React.useState<EventPriority>(EventPriority.Low);
   const emotes = ['💚', '🌟', '🔥', '💎', '🔒'];
   const text = ['Low', 'Medium', 'High', 'Top', 'FIXED'];
 

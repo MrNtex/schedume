@@ -87,6 +87,7 @@ export function EventCreator() {
         minute: minute,
         duration: advancedData.duration,
         id: newEventData.id,
+        eventPriority: newEventData?.eventPriority || 0,
         EventTypeID: eventTypeID,
         period: advancedData.period || EventPeriod.EveryDay,
         weekdays: advancedData.weekdays, 
@@ -100,6 +101,7 @@ export function EventCreator() {
         duration: 60,
         id: "",
         EventTypeID: eventTypeID,
+        eventPriority: newEventData?.eventPriority || 0,
         period: advancedData.period || EventPeriod.EveryDay,
         weekdays: advancedData.weekdays,
       })

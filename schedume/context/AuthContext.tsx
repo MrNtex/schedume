@@ -159,6 +159,7 @@ export function AuthProvider(props: { children: any }) {
   }, []);
 
   useEffect(() => {
+    console.log('User data changed:', userDataObj);
     const fetchUserData = async () => {
       try {
         if (!user) {
