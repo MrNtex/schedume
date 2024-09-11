@@ -41,13 +41,17 @@ export default function DayContextProvider(props: { children: any }) {
             return
         }
 
-        if (wakeUpTime.toDateString() !== new Date().toDateString()) {
-            console.log('Updating wake up time')
+        if (wakeUpTime.toDateString() != new Date().toDateString()) {
             setSettingWakeUpTime(true)
         }
-
-        setUserDataObj({ ...userDataObj, wakeUpTime: wakeUpTime, lastLogin: lastLogin })
     }, [user])
+
+    useEffect(() => {
+        if (user == null) return
+        if (userDataObj == null) return
+
+        setUserDataObj({ ...userDataObj, wakeUpTime })
+    }, [wakeUpTime])
 
     const value = {
         wakeUpTime,
