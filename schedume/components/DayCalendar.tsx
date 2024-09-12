@@ -69,6 +69,21 @@ export default function DayCalendar() {
   }
 
   const Events = () => {
+    if (currentTime.getDate() !== date.getDate()) {
+      return events
+      .filter((event) => ValidateEvent(event))
+      .map((event) => (
+        <React.Fragment key={event.id}>
+          <CalendarEvent event={event} partial={false} />
+          {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
+            <CalendarEvent event={event} partial={true} />
+          )}
+        </React.Fragment>
+      ));
+    }
+
+
+
     let fixedEvents: ScheduleEvent[] = []
     let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
 
@@ -113,7 +128,7 @@ export default function DayCalendar() {
         <Events />
         {/* Current Time Line */}
         <HourOnDayCalendar date={currentTime} />
-        <HourOnDayCalendar date={wakeUpTime} />
+        {currentTime.getDate() == date.getDate() && (<HourOnDayCalendar date={wakeUpTime} />)}
         <div className="grid grid-cols-1 border-gray-300 mx-auto">
           {hours.map((hour) => (
             <Hour hour={hour} key={hour}/>

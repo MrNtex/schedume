@@ -228,7 +228,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     >
       <div
         ref={eventRef} // Reference to the draggable element
-        className={`absolute rounded-xl px-5 w-[40%] '${event.eventPriority == EventPriority.Fixed && 'border-4 border-emerald-100'}''${isDragging && 'brightness-50'}`}
+        className={`absolute rounded-xl px-5 w-[40%] ${event.eventPriority == EventPriority.Fixed ? 'border-4 border-emerald-100' : ''} ${isDragging ? 'brightness-50' : ''}`}
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,
