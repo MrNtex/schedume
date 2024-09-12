@@ -16,8 +16,9 @@ import { useDashboard } from "@/app/dashboard/page";
 
 export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, setChangingDate } = useDashboard();
+  const { CreateEvent, setChangingDate, editMode, setEditMode  } = useDashboard();
 
+  console.log("Edit Mode: ", editMode);
   const links = [
     {
       title: "New Event",
@@ -28,11 +29,12 @@ export function DashboardFloatingDock() {
     },
 
     {
-      title: "Products",
+      title: "Edit mode",
       icon: (
         <IconTerminal2 className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      color: editMode ? "bg-emerald-500 dark:bg-emerald-600" : undefined,
+      onClick: () => { setEditMode(!editMode) }
     },
     {
       title: "Go to Date",

@@ -22,7 +22,7 @@ export const FloatingDock = ({
   desktopClassName,
   mobileClassName,
 }: {
-  items: { title: string; icon: React.ReactNode; href?: string; onClick?: () => void }[];
+  items: { title: string; icon: React.ReactNode; href?: string; onClick?: () => void; color?: string }[];
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
@@ -94,7 +94,7 @@ const FloatingDockDesktop = ({
   items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href?: string; onClick?: () => void }[];
+  items: { title: string; icon: React.ReactNode; href?: string; onClick?: () => void, color?: string }[];
   className?: string;
 }) => {
   let mouseX = useMotionValue(Infinity);
@@ -120,12 +120,14 @@ function IconContainer({
   icon,
   href,
   onClick,
+  color,
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href?: string;
   onClick?: () => void;
+  color?: string;
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
@@ -169,14 +171,16 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
+  console.log("Color", color);
+
   return (
-    <Link href={href || ""} onClick={onClick}>
+    <Link href={href || "#"} onClick={onClick}>
       <motion.div
         ref={ref}
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
+        className={`aspect-square rounded-full ${color != null ? color : 'bg-gray-200 dark:bg-neutral-800'} flex items-center justify-center relative`}
       >
         <AnimatePresence>
           {hovered && (

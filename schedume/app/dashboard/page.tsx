@@ -6,7 +6,7 @@ import { EventCreator } from '@/components/EventCreator/EventCreator'
 import Login from '@/components/Login'
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { useAuth } from '@/context/AuthContext'
-import { EventPeriod, ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
+import { EventPeriod, EventPriority, ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
 import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
@@ -51,6 +51,9 @@ interface DashboardContextType {
   CreateEvent: (event?: ScheduleEvent) => void;
   date: Date;
   setDate: (date: Date) => void;
+
+  editMode: boolean;
+  setEditMode: (value: boolean) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -63,6 +66,9 @@ const DashboardContext = React.createContext<DashboardContextType>({
   CreateEvent: () => {},
   date: new Date(),
   setDate: () => {},
+
+  editMode: false,
+  setEditMode: () => {},
 })
 
 
@@ -74,6 +80,8 @@ function MainContent() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
   const [settingWakeUpTime, setSettingWakeUpTime] = useState(false);
+
+  const [editMode, setEditMode] = useState(true);
   useEffect(() => {
     console.log(settingWakeUpTime)
   }, [settingWakeUpTime])
@@ -92,6 +100,7 @@ function MainContent() {
         id: '',
         EventTypeID: event?.EventTypeID || -1,
         period: event?.period || EventPeriod.EveryDay,
+        eventPriority: event?.eventPriority || EventPriority.Low,
     })
   }
 
@@ -116,6 +125,8 @@ function MainContent() {
     CreateEvent,
     date,
     setDate,
+    editMode,
+    setEditMode,
   }
   
   return (

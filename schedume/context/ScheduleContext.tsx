@@ -60,8 +60,7 @@ export class ScheduleEvent {
   
 
 interface ScheduleContextType {
-    events: ScheduleEvent[];
-    EventDict: { [id: string]: ScheduleEvent };
+    events: { [id: string]: ScheduleEvent };
 
     loading: boolean;
 
@@ -77,8 +76,7 @@ interface ScheduleContextType {
 }
 
 const ScheduleContext = React.createContext<ScheduleContextType>({
-    events: [],
-    EventDict: {},
+    events: {},
 
     loading: false,
 
@@ -100,8 +98,7 @@ export function useSchedule() {
 
 export function ScheduleProvider(props: { children: any }) {
     const { user } = useAuth()
-    const [events, setEvents] = React.useState<ScheduleEvent[]>([])
-    const [EventDict, setEventDict] = React.useState<{ [id: string]: ScheduleEvent }>({})
+    const [events, setEvents] = React.useState<{ [id: string]: ScheduleEvent }>({})
 
     const [loading, setLoading] = React.useState(true)
 
@@ -136,7 +133,7 @@ export function ScheduleProvider(props: { children: any }) {
     }
     useEffect(() => {
         if (!user) {
-            setEvents([]) // Clear events if user is not logged in
+            setEvents({}) // Clear events if user is not logged in
             return
         }
         
@@ -149,16 +146,11 @@ export function ScheduleProvider(props: { children: any }) {
 
                 const userEvents = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as ScheduleEvent[];
 
-                const EventsCollection = collection(db, 'users', user.uid, 'Events')
-                const EventsSnapshot = await getDocs(EventsCollection)
-                const EventsArray = EventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as ScheduleEvent[];
-
-                const EventsDictionary = EventsArray.reduce((acc, Event) => {
+                const eventsDictionary = userEvents.reduce((acc, Event) => {
                 acc[Event.id] = Event;
                 return acc;
                 }, {} as Record<string, ScheduleEvent>);
-                setEventDict(EventsDictionary)
-                setEvents(userEvents)
+                setEvents(eventsDictionary)
             } catch (error) {
                 console.error('Error fetching events:', error)
             } finally {
@@ -183,31 +175,35 @@ export function ScheduleProvider(props: { children: any }) {
 
         const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
         await updateDoc(docRef, { id: docRef.id });
-        setEvents(prevEvents => [...prevEvents, { ...event, id: docRef.id }])
+        setEvents(prevEvents => ({ ...prevEvents, [docRef.id]: { ...event, id: docRef.id } }))
 
         console.log('Event added:', event)
     }
     
     const UpdateEvent = async (event: ScheduleEvent) => {
-        if(event.id === undefined) { throw new Error('Event id is undefined') }
-        if (!user) {
-            throw new Error('User not logged in')
+        if (!event.id) {
+            throw new Error('Event id is undefined');
         }
-    
+        if (!user) {
+            throw new Error('User not logged in');
+        }
+
         ValidateEvent(event);
         try {
-            const eventDocRef = doc(db, 'users', user.uid, 'events', event.id.toString())
-    
+            const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
+
             await updateDoc(eventDocRef, {
                 ...event
-            })
-    
-            setEvents(prevEvents =>
-                prevEvents.map(ev => (ev.id === event.id ? { ...ev, ...event } : ev))
-            );
-            console.log('Event updated:', event)
+            });
+
+            setEvents(prevEvents => ({
+                ...prevEvents,
+                [event.id]: { ...prevEvents[event.id], ...event }
+            }));
+
+            console.log('Event updated:', event);
         } catch (error) {
-            console.error('Error updating event:', error)
+            console.error('Error updating event:', error);
         }
     }
 
@@ -215,22 +211,29 @@ export function ScheduleProvider(props: { children: any }) {
 
     const removeEvent = async (id: string) => {
         if (!user) {
-            throw new Error('User not logged in')
-            return
+            throw new Error('User not logged in');
         }
-    
-        await deleteDoc(doc(db, 'users', user.uid, 'events', id))
-        setEvents(prevEvents => prevEvents.filter(event => event.id !== id))
+
+        try {
+            await deleteDoc(doc(db, 'users', user.uid, 'events', id));
+            setEvents(prevEvents => {
+                const newEvents = { ...prevEvents };
+                delete newEvents[id];
+                return newEvents;
+            });
+
+            console.log('Event removed:', id);
+        } catch (error) {
+            console.error('Error removing event:', error);
+        }
     }
 
     function debug() {
         console.log('Events:', events)
-        console.log('EventDict:', EventDict)
     }
 
     const value = {
         events: events,
-        EventDict: EventDict,
         loading: false,
 
         addEvent: addEvent,

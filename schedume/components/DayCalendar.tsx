@@ -11,7 +11,7 @@ const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 export default function DayCalendar() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, date } = useDashboard();
+  const { CreateEvent, date, editMode } = useDashboard();
   const { wakeUpTime } = useDayContext();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -69,27 +69,32 @@ export default function DayCalendar() {
   }
 
   const Events = () => {
-    if (currentTime.getDate() !== date.getDate()) {
-      return events
-      .filter((event) => ValidateEvent(event))
-      .map((event) => (
-        <React.Fragment key={event.id}>
-          <CalendarEvent event={event} partial={false} />
-          {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
-            <CalendarEvent event={event} partial={true} />
-          )}
-        </React.Fragment>
-      ));
-    }
+    console.log(events);
+
+      if (currentTime.getDate() !== date.getDate() || editMode) {
+  
+        return Object.values(events)
+        .filter((event: ScheduleEvent) => ValidateEvent(event as ScheduleEvent))
+        .map((event: ScheduleEvent) => (
+          <React.Fragment key={event.id}>
+            <CalendarEvent event={event} partial={false} />
+            {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
+              <CalendarEvent event={event} partial={true} />
+            )}
+          </React.Fragment>
+        ));
+      }
 
 
 
     let fixedEvents: ScheduleEvent[] = []
+    fixedEvents = Object.values(events);
+
     let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
 
-    events.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
+    fixedEvents.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
 
-    events.forEach(element => {
+    fixedEvents.forEach(element => {
       let startTime = element.hour * 60 + element.minute;
       if (element.eventPriority == EventPriority.Fixed){
         fixedEvents.push(element);
