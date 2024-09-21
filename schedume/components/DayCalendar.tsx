@@ -94,29 +94,42 @@ export default function DayCalendar() {
 
     fixedEvents.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
 
-    fixedEvents.forEach(element => {
+    fixedEvents.forEach((element, index) => {
       let startTime = element.hour * 60 + element.minute;
       if (element.eventPriority == EventPriority.Fixed){
-        fixedEvents.push(element);
         endTime = startTime + element.duration;
         return;
       }
       
       if (startTime > endTime) {
-        fixedEvents.push(element);
         endTime = startTime + element.duration;
       }
       else {
+       
+        if(index > 0)
+        {
+          let last = fixedEvents[index - 1];
+          console.log('Last event:', last);
+          if(last.eventPriority == EventPriority.Flexible) // If last event is flexible, we can try to reduce the duration
+          {
+            let lastEndTime = last.hour * 60 + last.minute + last.duration;
+            if(lastEndTime - startTime < last.duration / 2)
+            {
+              last.duration = startTime - last.hour * 60 + last.minute ;
+              console.log('Reduced duration of event:', last);
+              endTime = startTime;
+            }
+          }
+        }
         element.hour = Math.floor(endTime / 60);
         element.minute = endTime % 60;
-        fixedEvents.push(element);
         endTime = startTime + element.duration;
       }
     });
 
     return fixedEvents
       .filter((event) => ValidateEvent(event))
-      .map((event) => (
+      .map((event, idx) => (
         <React.Fragment key={event.id}>
           <CalendarEvent event={event} partial={false} />
           {event.hour * 60 + event.minute + event.duration > 24 * 60 && (

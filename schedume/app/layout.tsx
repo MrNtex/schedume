@@ -33,7 +33,7 @@ export default function RootLayout({
   const footer = (
     <footer className="p-4 sm:p-8 grid place-items-center">
       <p>&copy; 2024 ScheduMe</p>
-      <p>Built by Artur Niemiec 💛</p>
+      <p>Built with 💛 by Artur Niemiec</p>
     </footer>
   );
 
