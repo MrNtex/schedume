@@ -21,6 +21,8 @@ import PrioritySelector from "./PrioritySelector"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useAuth } from "@/context/AuthContext"
 import { useDashboard } from "@/app/dashboard/page"
+import { Trash } from "lucide-react"
+import AddEventType from "../AddEventType"
 
 export interface AdvancedData {
   period?: EventPeriod
@@ -73,6 +75,7 @@ export function EventCreator() {
               style={{ backgroundColor: userEventTypes[key].color }}
             />
             <div className="ml-2">{userEventTypes[key].name}</div>
+            <Trash className="ml-auto" size={16} />
           </div>
         </SelectItem>
       );
@@ -129,10 +132,11 @@ export function EventCreator() {
                     </SelectTrigger>
                     <SelectContent position="popper">
                     <EventTypes/>
-                    <SelectItem value="More">Create more...</SelectItem>
+                    <AddEventType/>
                     </SelectContent>
                 </Select>
               </div>
+
               
             </form>
           </CardContent>

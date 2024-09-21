@@ -22,7 +22,7 @@ export default function HourOnDayCalendar({ date, onClick }: { date?: Date, onCl
         }}
     >
         <span 
-            className={`absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded ${onClick ? 'cursor-pointer' : ''}`} 
+            className={`absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded ${onClick ? 'cursor-pointer hover:bg-red-700 transition-colors duration-200 ease-in-out' : ''}`} 
             onClick={handleClick}
         >
         {`${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`}

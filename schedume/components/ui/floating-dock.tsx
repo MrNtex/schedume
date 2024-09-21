@@ -174,13 +174,13 @@ function IconContainer({
   console.log("Color", color);
 
   return (
-    <Link href={href || "#"} onClick={onClick}>
+    <div onClick={onClick}>
       <motion.div
         ref={ref}
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className={`aspect-square rounded-full ${color != null ? color : 'bg-gray-200 dark:bg-neutral-800'} flex items-center justify-center relative`}
+        className={`aspect-square rounded-full ${color != null ? color : 'bg-gray-200 dark:bg-neutral-800'} flex items-center justify-center relative cursor-pointer`}
       >
         <AnimatePresence>
           {hovered && (
@@ -201,6 +201,6 @@ function IconContainer({
           {icon}
         </motion.div>
       </motion.div>
-    </Link>
+    </div>
   );
 }

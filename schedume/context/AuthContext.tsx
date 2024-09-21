@@ -21,10 +21,17 @@ interface AuthContextType {
   userDataObj: UserData | null;
   setUserDataObj: (data: UserData) => void;
   userEventTypes: any;
+  addUserEventType: (eventType: any) => void;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   loading: boolean;
+}
+
+type EventType = {
+  id: string;
+  name: string;
+  color: string;
 }
 
 const defaultAuthContext: AuthContextType = {
@@ -32,6 +39,7 @@ const defaultAuthContext: AuthContextType = {
   userDataObj: null,
   setUserDataObj: () => {},
   userEventTypes: {},
+  addUserEventType: () => {},
   signup: async () => {},
   login: async () => {},
   logout: async () => {},
@@ -48,7 +56,7 @@ export function AuthProvider(props: { children: any }) {
 
   const [user, setUser] = useState<User | null>(null)
   const [userDataObj, setUserDataObj] = useState<UserData | null>(null)
-  const [userEventTypes, setUserEventTypes] = useState<Record<string, any>>({})
+  const [userEventTypes, setUserEventTypes] = useState<Record<string, EventType>>({})
   const [loading, setLoading] = useState(true)
 
 
@@ -142,8 +150,9 @@ export function AuthProvider(props: { children: any }) {
         const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types');
         const eventsTypesSnapshot = await getDocs(eventsTypesCollection);
   
-        const userEventTypes = eventsTypesSnapshot.docs.reduce((types: Record<string, any>, doc) => {
-          types[doc.id] = { id: doc.id, ...doc.data() };
+        const userEventTypes = eventsTypesSnapshot.docs.reduce((types: Record<string, EventType>, doc) => {
+          const data = doc.data();
+          types[doc.id] = { id: doc.id, name: data.name, color: data.color };
           return types;
         }, {});
         setUserEventTypes(userEventTypes);
@@ -174,11 +183,30 @@ export function AuthProvider(props: { children: any }) {
     }
     fetchUserData()
   }, [userDataObj])
+
+  function addUserEventType(eventType: EventType) {
+    if (!user) {
+      return
+    }
+
+    if (!eventType.id) {
+      // Find the next free id in the dictionary
+      const nextId = Object.keys(userEventTypes).length + 1;
+      eventType.id = nextId.toString();
+    }
+    setUserEventTypes((prev) => ({ ...prev, [eventType.id]: eventType }))
+
+    const eventsTypesCollection = collection(db, 'users', user?.uid, 'event_types');
+    const eventDocRef = doc(eventsTypesCollection, eventType.id);
+    setDoc(eventDocRef, eventType, { merge: true });
+    setUserEventTypes((prev) => ({ ...prev, [eventType.id]: eventType }));
+  }
   const value: AuthContextType = {
     user,
     userDataObj,
     setUserDataObj,
     userEventTypes,
+    addUserEventType,
     signup,
     login,
     logout,
