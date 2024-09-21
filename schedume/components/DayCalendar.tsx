@@ -88,7 +88,7 @@ export default function DayCalendar() {
 
 
     let fixedEvents: ScheduleEvent[] = []
-    fixedEvents = Object.values(events);
+    fixedEvents = JSON.parse(JSON.stringify(Object.values(events))); // deep copy
 
     let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
 
