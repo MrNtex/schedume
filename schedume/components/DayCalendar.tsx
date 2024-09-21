@@ -11,7 +11,7 @@ const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 export default function DayCalendar() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, date, editMode } = useDashboard();
+  const { CreateEvent, date, editMode, setSettingWakeUpTime } = useDashboard();
   const { wakeUpTime } = useDayContext();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
@@ -146,7 +146,7 @@ export default function DayCalendar() {
         <Events />
         {/* Current Time Line */}
         <HourOnDayCalendar date={currentTime} />
-        {currentTime.getDate() == date.getDate() && (<HourOnDayCalendar date={wakeUpTime} />)}
+        {currentTime.getDate() == date.getDate() && (<HourOnDayCalendar date={wakeUpTime} onClick={() => setSettingWakeUpTime(true)} />)}
         <div className="grid grid-cols-1 border-gray-300 mx-auto">
           {hours.map((hour) => (
             <Hour hour={hour} key={hour}/>

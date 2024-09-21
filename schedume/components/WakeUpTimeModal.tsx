@@ -9,14 +9,19 @@ import TimeInput from './TimeInput'
 import { useDashboard } from '@/app/dashboard/page'
 
 export default function WakeUpTimeModal() {
-    const { setWakeUpTime } = useDayContext()
+    const { setWakeUpTime, wakeUpTime } = useDayContext()
     const { setSettingWakeUpTime } = useDashboard()
 
-    let time = new Date()
+    let time = wakeUpTime || new Date()
 
     function Submit()
     {
         setWakeUpTime(time)
+        setSettingWakeUpTime(false)
+    }
+
+    function Skip()
+    {
         setSettingWakeUpTime(false)
     }
 
@@ -35,7 +40,7 @@ export default function WakeUpTimeModal() {
         </form>
         </CardContent>
         <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => Submit()}>Skip</Button>
+            <Button variant="outline" onClick={() => Skip()}>Skip</Button>
             <Button variant="outline" onClick={() => Submit()}>Submit</Button>
         </CardFooter>
     </Card>

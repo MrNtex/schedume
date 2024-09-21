@@ -21,7 +21,7 @@ export default function Login() {
 
   const { toast } = useToast()
 
-  const { login } = useAuth()
+  const { login, user } = useAuth()
 
   const router = useRouter();
 
@@ -74,6 +74,9 @@ export default function Login() {
     }
     finally {
       setAuthenticating(false)
+      if (user != null) {
+        router.push('/dashboard')
+      }
     }
   }
 

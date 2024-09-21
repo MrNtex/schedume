@@ -1,9 +1,16 @@
 import React from 'react'
 
-export default function HourOnDayCalendar({ date }: { date?: Date }) {
+export default function HourOnDayCalendar({ date, onClick }: { date?: Date, onClick?: () => void; }) {
   if(date == null || typeof date !== 'object' || !(date instanceof Date)) {
     console.error("Invalid date", date)
     return
+  }
+  function handleClick()
+  {
+    if(onClick)
+    {
+      onClick()
+    }
   }
 
   return (
@@ -14,7 +21,10 @@ export default function HourOnDayCalendar({ date }: { date?: Date }) {
 
         }}
     >
-        <span className="absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded">
+        <span 
+            className={`absolute left-0 -translate-y-1/2 -translate-x-12 bg-red-500 text-white px-2 py-1 rounded ${onClick ? 'cursor-pointer' : ''}`} 
+            onClick={handleClick}
+        >
         {`${date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`}
         </span>
     </div>

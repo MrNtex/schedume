@@ -34,7 +34,7 @@ export default function Signup() {
 
     const { toast } = useToast()
 
-    const { signup } = useAuth()
+    const { signup, user } = useAuth()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,6 +83,9 @@ export default function Signup() {
     }
     finally {
       setAuthenticating(false)
+      if (user != null) {
+        router.push('/dashboard')
+      }
     }
   }
   return (

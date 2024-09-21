@@ -100,7 +100,7 @@ function MainContent() {
         id: '',
         EventTypeID: event?.EventTypeID || -1,
         period: event?.period || EventPeriod.EveryDay,
-        eventPriority: event?.eventPriority || EventPriority.Low,
+        eventPriority: event?.eventPriority || EventPriority.Flexible,
     })
   }
 
