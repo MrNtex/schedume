@@ -11,6 +11,7 @@ import { Label } from './ui/label'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import UserHeader from './UserHeader'
+import { User } from 'firebase/auth'
 
 
 export default function Login() {
@@ -36,10 +37,10 @@ export default function Login() {
         description: "Please fill in your email and password.",})
       return
     }
-    
+    let usr: User | null = null // The user object returned by the login function, used to determine if the login was successful
     setAuthenticating(true)
     try {
-      await login(email, password)
+      usr = await login(email, password)
     }
     catch (error: any) {
       switch (error.code) {
@@ -74,7 +75,7 @@ export default function Login() {
     }
     finally {
       setAuthenticating(false)
-      if (user != null) {
+      if (usr != null) {
         router.push('/dashboard')
       }
     }

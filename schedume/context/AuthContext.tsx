@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndP
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect, use} from 'react'
 import { DefaultEvents } from './ScheduleContext'
+import { useRouter } from 'next/navigation'
 
 interface UserData {
   email: string;
@@ -60,6 +61,8 @@ export function AuthProvider(props: { children: any }) {
   const [userDataObj, setUserDataObj] = useState<UserData | null>(null)
   const [userEventTypes, setUserEventTypes] = useState<Record<string, EventType>>({})
   const [loading, setLoading] = useState(true)
+
+  const router = useRouter()
 
   // AUTH HAN
   function signup(email: string, password: string, firstName: string, lastName: string) {
@@ -163,6 +166,7 @@ export function AuthProvider(props: { children: any }) {
         setLoading(false);
         console.log('Loading done');
         console.log(userDataObj);
+        
       }
     });
     return unsubscribe;
