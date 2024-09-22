@@ -17,9 +17,12 @@ export default function WakeUpTimeModal() {
 
     function Submit()
     {
-        setWakeUpTime(time)
+        const todayTime = new Date()
+        todayTime.setHours(time.getHours(), time.getMinutes(), 0, 0)
+
+        setWakeUpTime(todayTime)
         setSettingWakeUpTime(false)
-        console.log('Wake up time set to: ', time)
+        console.log('Wake up time set to: ', todayTime)
     }
 
     function Skip()

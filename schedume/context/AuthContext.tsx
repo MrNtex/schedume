@@ -2,7 +2,7 @@
 
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
-import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect, use} from 'react'
 import { DefaultEvents } from './ScheduleContext'
 
@@ -22,6 +22,7 @@ interface AuthContextType {
   setUserDataObj: (data: UserData) => void;
   userEventTypes: any;
   addUserEventType: (eventType: any) => void;
+  removeEventType: (eventType: any) => void;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -40,6 +41,7 @@ const defaultAuthContext: AuthContextType = {
   setUserDataObj: () => {},
   userEventTypes: {},
   addUserEventType: () => {},
+  removeEventType: () => {},
   signup: async () => {},
   login: async () => {},
   logout: async () => {},
@@ -58,7 +60,6 @@ export function AuthProvider(props: { children: any }) {
   const [userDataObj, setUserDataObj] = useState<UserData | null>(null)
   const [userEventTypes, setUserEventTypes] = useState<Record<string, EventType>>({})
   const [loading, setLoading] = useState(true)
-
 
   // AUTH HAN
   function signup(email: string, password: string, firstName: string, lastName: string) {
@@ -201,12 +202,34 @@ export function AuthProvider(props: { children: any }) {
     setDoc(eventDocRef, eventType, { merge: true });
     setUserEventTypes((prev) => ({ ...prev, [eventType.id]: eventType }));
   }
+
+  async function removeEventType(eventType: EventType) {
+    console.log('Removing event type:', eventType);
+    if (!user) {
+      return
+    }
+    try
+    {
+      const eventsTypesCollection = collection(db, 'users', user?.uid, 'event_types');
+      const eventDocRef = doc(eventsTypesCollection, eventType.id);
+      await deleteDoc(eventDocRef);
+      setUserEventTypes((prev) => {
+        const updatedEventTypes = { ...prev };
+        delete updatedEventTypes[eventType.id]; // Remove the entry from the copied object
+        return updatedEventTypes; // Return the updated object
+      });
+    }
+    catch (err: any) {
+      console.log(err.message);
+    }
+  }
   const value: AuthContextType = {
     user,
     userDataObj,
     setUserDataObj,
     userEventTypes,
     addUserEventType,
+    removeEventType,
     signup,
     login,
     logout,

@@ -35,7 +35,7 @@ export function EventCreator() {
   const { addEvent, newEventData, UpdateEvent, removeEvent } = useSchedule()
   const { creatingEvent, setCreatingEvent } = useDashboard()
 
-  const { userEventTypes } = useAuth()
+  const { userEventTypes, removeEventType } = useAuth()
 
   const [ newEventDataLocal, setNewEventDataLocal ] = React.useState<ScheduleEvent>(newEventData || {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: 0, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]})
 
@@ -60,24 +60,37 @@ export function EventCreator() {
       removeEvent(newEventData.id)
     }
   }
+
   function Close()
   {
     setCreatingEvent(false)
   }
 
+  function handeRemoveEventType(e: React.MouseEvent<HTMLDivElement, MouseEvent>, eventType: any)
+  {
+    e.preventDefault();
+    e.stopPropagation();
+    removeEventType(eventType);
+  }
+
   const EventTypes = () => {
     return Object.keys(userEventTypes).map((key) => {
       return (
-        <SelectItem value={key} key={key}>
-          <div className="flex items-center">
-            <div
-              className="rounded-full w-3 h-3 border-2 border-zinc-900"
-              style={{ backgroundColor: userEventTypes[key].color }}
-            />
-            <div className="ml-2">{userEventTypes[key].name}</div>
-            <Trash className="ml-auto" size={16} />
+        <div className="relative">
+          <SelectItem value={key} key={key}>
+            <div className="flex items-center">
+              <div
+                className="rounded-full w-3 h-3 border-2 border-zinc-900"
+                style={{ backgroundColor: userEventTypes[key].color }}
+              />
+              <div className="ml-2">{userEventTypes[key].name}</div>
+            </div>
+          </SelectItem>
+          <div onClick={(e) => handeRemoveEventType(e, userEventTypes[key])} className="absolute top-1 right-1 hover:bg-zinc-900 rounded-md h-6 w-6 flex items-center justify-center cursor-pointer transition-colors duration-300 ease-in-out">
+            <Trash size={16} />
           </div>
-        </SelectItem>
+        </div>
+        
       );
     })
   }
@@ -131,8 +144,8 @@ export function EventCreator() {
                     <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                    <EventTypes/>
-                    <AddEventType/>
+                      <EventTypes/>
+                      <AddEventType/>
                     </SelectContent>
                 </Select>
               </div>
