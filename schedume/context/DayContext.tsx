@@ -47,6 +47,7 @@ export default function DayContextProvider(props: { children: any }) {
     }, [user])
 
     useEffect(() => {
+        console.log('I listen! ', wakeUpTime)
         if (user == null) return
         if (userDataObj == null) return
 
