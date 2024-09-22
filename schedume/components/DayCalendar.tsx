@@ -109,20 +109,19 @@ export default function DayCalendar() {
         if(index > 0)
         {
           let last = fixedEvents[index - 1];
-          console.log('Last event:', last);
           if(last.eventPriority == EventPriority.Flexible) // If last event is flexible, we can try to reduce the duration
           {
             let lastEndTime = last.hour * 60 + last.minute + last.duration;
             if(lastEndTime - startTime < last.duration / 2)
             {
               last.duration = startTime - last.hour * 60 + last.minute ;
-              console.log('Reduced duration of event:', last);
               endTime = startTime;
             }
           }
         }
         element.hour = Math.floor(endTime / 60);
         element.minute = endTime % 60;
+        startTime = element.hour * 60 + element.minute;
         endTime = startTime + element.duration;
       }
     });
