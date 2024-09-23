@@ -3,18 +3,15 @@
 import { DashboardFloatingDock } from '@/components/DashboardFloatingDock'
 import DayCalendar from '@/components/DayCalendar'
 import { EventCreator } from '@/components/EventCreator/EventCreator'
-import Login from '@/components/Login'
-import { FloatingDock } from '@/components/ui/floating-dock'
 import { useAuth } from '@/context/AuthContext'
 import { EventPeriod, EventPriority, ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
-import { Main } from 'next/document'
 import React, { useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
-import { Calendar } from '@/components/ui/calendar'
-import { DatePicker } from '@/components/DatePicker'
 import DatePickerModal from '@/components/DatePickerModal'
 import DayContextProvider from '@/context/DayContext'
 import WakeUpTimeModal from '@/components/WakeUpTimeModal'
+
+import { cookies } from 'next/headers'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -80,11 +77,18 @@ function MainContent() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
   const [settingWakeUpTime, setSettingWakeUpTime] = useState(false);
-
-  const [editMode, setEditMode] = useState(true);
   useEffect(() => {
     console.log(settingWakeUpTime)
   }, [settingWakeUpTime])
+
+  const cookieStore = cookies();
+  const editModeCookie = cookieStore.get('editMode');
+
+  const [editMode, setEditMode] = useState(editModeCookie || false);
+  useEffect(() => {
+    cookieStore.set('editMode', editMode.toString(), { path: '/dashboard' });
+  }, [editMode]);
+  
 
   const [date, setDate] = useState<Date>(new Date());
 
