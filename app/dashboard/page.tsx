@@ -11,7 +11,7 @@ import DatePickerModal from '@/components/DatePickerModal'
 import DayContextProvider from '@/context/DayContext'
 import WakeUpTimeModal from '@/components/WakeUpTimeModal'
 
-import { cookies } from 'next/headers'
+import { useCookies } from 'next-client-cookies';
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -81,12 +81,13 @@ function MainContent() {
     console.log(settingWakeUpTime)
   }, [settingWakeUpTime])
 
-  const cookieStore = cookies();
-  const editModeCookie = cookieStore.get('editMode');
+  const cookies = useCookies();
+
+  const editModeCookie = cookies.get('editMode') == "true";
 
   const [editMode, setEditMode] = useState(editModeCookie || false);
   useEffect(() => {
-    cookieStore.set('editMode', editMode.toString(), { path: '/dashboard' });
+    cookies.set('editMode', editMode.toString(), { path: '/' });
   }, [editMode]);
   
 

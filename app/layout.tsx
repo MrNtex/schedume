@@ -4,7 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { AuthProvider } from "@/context/AuthContext";
-import Link from "next/link";
+import { CookiesProvider } from 'next-client-cookies/server';
 import { Toaster } from "@/components/ui/toaster";
 import UserHeader from "@/components/UserHeader";
 
@@ -39,6 +39,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <CookiesProvider>
       <AuthProvider>
       <body className={ 'flex flex-col w-full mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
         <ThemeProvider attribute="class"
@@ -52,6 +53,7 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
       </AuthProvider>
+      </CookiesProvider>
     </html>
   );
 }
