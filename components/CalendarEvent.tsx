@@ -11,6 +11,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
   const [isResizing, setIsResizing] = useState(false);
 
   const eventRef = useRef<HTMLDivElement>(null); // Reference to the draggable element
+  const { editMode } = useDashboard();
 
   const { userEventTypes } = useAuth();
   const { UpdateEvent, setNewEventData } = useSchedule();
@@ -62,6 +63,11 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
   const handleStop = () => {
     if (position === -1 || !isDragging) return; // Guard clause if position is not set
     // Update the event with the new calculated hours and minutes
+    if (editMode)
+    {
+      
+    }
+
     UpdateEvent({ ...event, hour: tempEvent.hour, minute: tempEvent.minute })
       .catch(console.error)
       .finally(() => {

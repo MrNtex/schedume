@@ -3,18 +3,18 @@ import CalendarEvent from './CalendarEvent';
 import { EventPeriod, EventPriority, useSchedule } from '@/context/ScheduleContext';
 import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
-import { useDayContext } from '@/context/DayContext';
 import HourOnDayCalendar from './HourOnDayCalendar';
+import { getLocalEvents } from '@/lib/local_events';
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 
 export default function DayCalendar() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, date, editMode, setSettingWakeUpTime } = useDashboard();
-  const { wakeUpTime } = useDayContext();
+  const { CreateEvent, date, editMode, setSettingWakeUpTime, wakeUpTime, fixedEvents } = useDashboard();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+
 
   useEffect(() => {
     const updateTime = () => {
@@ -69,8 +69,6 @@ export default function DayCalendar() {
   }
 
   const Events = () => {
-    console.log(events);
-
       if (currentTime.getDate() !== date.getDate() || editMode) {
   
         return Object.values(events)
@@ -85,48 +83,7 @@ export default function DayCalendar() {
         ));
       }
 
-
-
-    let fixedEvents: ScheduleEvent[] = []
-    fixedEvents = JSON.parse(JSON.stringify(Object.values(events))); // deep copy
-
-    let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
-
-    fixedEvents.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
-
-    fixedEvents.forEach((element, index) => {
-      let startTime = element.hour * 60 + element.minute;
-      if (element.eventPriority == EventPriority.Fixed){
-        endTime = startTime + element.duration;
-        return;
-      }
-      
-      if (startTime > endTime) {
-        endTime = startTime + element.duration;
-      }
-      else {
-       
-        if(index > 0)
-        {
-          let last = fixedEvents[index - 1];
-          if(last.eventPriority == EventPriority.Flexible) // If last event is flexible, we can try to reduce the duration
-          {
-            let lastEndTime = last.hour * 60 + last.minute + last.duration;
-            if(lastEndTime - startTime < last.duration / 2)
-            {
-              last.duration = startTime - last.hour * 60 + last.minute ;
-              endTime = startTime;
-            }
-          }
-        }
-        element.hour = Math.floor(endTime / 60);
-        element.minute = endTime % 60;
-        startTime = element.hour * 60 + element.minute;
-        endTime = startTime + element.duration;
-      }
-    });
-
-    return fixedEvents
+    return getLocalEvents(fixedEvents, wakeUpTime || new Date(0, 0, 0, 0, 0))
       .filter((event) => ValidateEvent(event))
       .map((event, idx) => (
         <React.Fragment key={event.id}>

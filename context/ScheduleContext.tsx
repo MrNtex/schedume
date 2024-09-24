@@ -198,8 +198,6 @@ export function ScheduleProvider(props: { children: any }) {
                 ...prevEvents,
                 [event.id]: { ...prevEvents[event.id], ...event }
             }));
-
-            console.log('Event updated:', event);
         } catch (error) {
             console.error('Error updating event:', error);
         }

@@ -5,13 +5,11 @@ import { DatePicker } from './DatePicker'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './ui/card'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
-import { useDayContext } from '@/context/DayContext'
 import TimeInput from './TimeInput'
 import { useDashboard } from '@/app/dashboard/page'
 
 export default function WakeUpTimeModal() {
-    const { setWakeUpTime, wakeUpTime } = useDayContext()
-    const { setSettingWakeUpTime } = useDashboard()
+    const { setSettingWakeUpTime, setWakeUpTime, wakeUpTime  } = useDashboard()
 
     const [time, setTime] = useState<Date>(wakeUpTime || new Date())
 

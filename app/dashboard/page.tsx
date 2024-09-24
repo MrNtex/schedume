@@ -5,13 +5,14 @@ import DayCalendar from '@/components/DayCalendar'
 import { EventCreator } from '@/components/EventCreator/EventCreator'
 import { useAuth } from '@/context/AuthContext'
 import { EventPeriod, EventPriority, ScheduleProvider, useSchedule } from '@/context/ScheduleContext'
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { ScheduleEvent } from '@/context/ScheduleContext'
 import DatePickerModal from '@/components/DatePickerModal'
-import DayContextProvider from '@/context/DayContext'
 import WakeUpTimeModal from '@/components/WakeUpTimeModal'
 
 import { useCookies } from 'next-client-cookies';
+import { getLocalEvents } from '@/lib/local_events'
+import { set } from 'date-fns'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -42,8 +43,11 @@ interface DashboardContextType {
   setCreatingEvent: (value: boolean) => void;
   changingDate: boolean
   setChangingDate: (value: boolean) => void;
+
   settingWakeUpTime: boolean
   setSettingWakeUpTime: (value: boolean) => void;
+  wakeUpTime: Date;
+  setWakeUpTime: (value: Date) => void;
 
   CreateEvent: (event?: ScheduleEvent) => void;
   date: Date;
@@ -51,6 +55,9 @@ interface DashboardContextType {
 
   editMode: boolean;
   setEditMode: (value: boolean) => void;
+
+  fixedEvents: ScheduleEvent[];
+  setFixedEvents: (value: ScheduleEvent[]) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -58,19 +65,27 @@ const DashboardContext = React.createContext<DashboardContextType>({
   setCreatingEvent: () => {},
   changingDate: false,
   setChangingDate: () => {},
+
   settingWakeUpTime: false,
   setSettingWakeUpTime: () => {},
+  wakeUpTime: new Date(),
+  setWakeUpTime: () => {},
+
   CreateEvent: () => {},
   date: new Date(),
   setDate: () => {},
 
   editMode: false,
   setEditMode: () => {},
+
+  fixedEvents: [],
+  setFixedEvents: () => {},
 })
 
 
 function MainContent() {
   // It's important to use the `useSchedule` hook inside the `ScheduleProvider` component
+  const { events } = useSchedule();
 
   const { newEventData, setNewEventData, } = useSchedule();
 
@@ -81,6 +96,36 @@ function MainContent() {
     console.log(settingWakeUpTime)
   }, [settingWakeUpTime])
 
+  const [date, setDate] = useState<Date>(new Date());
+
+  const { user, userDataObj, setUserDataObj } = useAuth()
+  const [wakeUpTime, setWakeUpTime] = React.useState<Date>(userDataObj?.wakeUpTime || new Date())
+  useEffect(() => {
+    if (user == null) return
+    if (userDataObj == null) return
+
+    setUserDataObj({ ...userDataObj, wakeUpTime })
+  }, [wakeUpTime])
+  useEffect(() => {
+    setWakeUpTime(userDataObj?.wakeUpTime || new Date())
+
+    if (userDataObj == null) {
+        setWakeUpTime(new Date()) // Clear events if user is not logged in
+        return
+    }
+
+    if (wakeUpTime.toDateString() != new Date().toDateString()) {
+        setSettingWakeUpTime(true)
+    }
+  }, [user])
+  
+
+  
+  const [fixedEvents, setFixedEvents] = useState<ScheduleEvent[]>(JSON.parse(JSON.stringify(Object.values(events))));
+  useEffect(() => {
+    setFixedEvents(JSON.parse(JSON.stringify(Object.values(events)))); // Deep copy);
+  }, [events]);
+
   const cookies = useCookies();
 
   const editModeCookie = cookies.get('editMode') == "true";
@@ -90,8 +135,6 @@ function MainContent() {
     cookies.set('editMode', editMode.toString(), { path: '/' });
   }, [editMode]);
   
-
-  const [date, setDate] = useState<Date>(new Date());
 
   function CreateEvent(event?: ScheduleEvent) {
     setCreatingEvent(true)
@@ -125,18 +168,24 @@ function MainContent() {
     setCreatingEvent,
     changingDate: isChangingDate,
     setChangingDate: setIsChangingDate,
+
     settingWakeUpTime,
     setSettingWakeUpTime: setSettingWakeUpTime,
+    wakeUpTime,
+    setWakeUpTime,
+
     CreateEvent,
     date,
     setDate,
     editMode,
     setEditMode,
+
+    fixedEvents,
+    setFixedEvents,
   }
   
   return (
     <DashboardContext.Provider value={value}>
-      <DayContextProvider>
       <CurrentDate/>
 
         {settingWakeUpTime && (
@@ -157,7 +206,6 @@ function MainContent() {
 
         <DayCalendar />
         <DashboardFloatingDock />
-      </DayContextProvider>
       
     </DashboardContext.Provider>
   );
