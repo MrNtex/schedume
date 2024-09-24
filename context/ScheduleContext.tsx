@@ -59,13 +59,14 @@ export class ScheduleEvent {
 
 interface ScheduleContextType {
     events: { [id: string]: ScheduleEvent };
+    localEvents: ScheduleEvent[];
 
     loading: boolean;
 
     addEvent: (event: ScheduleEvent) => Promise<void>;
     removeEvent: (id: string) => Promise<void>;
 
-    UpdateEvent: (event: ScheduleEvent) => Promise<void>;
+    UpdateEvent: (event: ScheduleEvent, local: boolean) => Promise<void>;
 
     newEventData?: ScheduleEvent;
     setNewEventData: (event: ScheduleEvent) => void;
@@ -75,6 +76,7 @@ interface ScheduleContextType {
 
 const ScheduleContext = React.createContext<ScheduleContextType>({
     events: {},
+    localEvents: [],
 
     loading: false,
 
@@ -97,6 +99,10 @@ export function useSchedule() {
 export function ScheduleProvider(props: { children: any }) {
     const { user } = useAuth()
     const [events, setEvents] = React.useState<{ [id: string]: ScheduleEvent }>({})
+    const [localEvents, setLocalEvents] = React.useState<ScheduleEvent[]>([])
+    useEffect(() => {
+        setLocalEvents(JSON.parse(JSON.stringify(Object.values(events)))); // Deep copy);
+    }, [events]);
 
     const [loading, setLoading] = React.useState(true)
 
@@ -178,7 +184,7 @@ export function ScheduleProvider(props: { children: any }) {
         console.log('Event added:', event)
     }
     
-    const UpdateEvent = async (event: ScheduleEvent) => {
+    const UpdateEvent = async (event: ScheduleEvent, localy: boolean = false) => {
         if (!event.id) {
             throw new Error('Event id is undefined');
         }
@@ -188,16 +194,32 @@ export function ScheduleProvider(props: { children: any }) {
 
         ValidateEvent(event);
         try {
-            const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
+            console.log("Localy: ", localy)
+            if(!localy) {
 
-            await updateDoc(eventDocRef, {
-                ...event
-            });
+                const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
 
-            setEvents(prevEvents => ({
-                ...prevEvents,
-                [event.id]: { ...prevEvents[event.id], ...event }
-            }));
+                await updateDoc(eventDocRef, {
+                    ...event
+                });
+
+                setEvents(prevEvents => ({
+                    ...prevEvents,
+                    [event.id]: { ...prevEvents[event.id], ...event }
+                }));
+            } else {
+                setLocalEvents(prevEvents => {
+                    const eventExists = prevEvents.some(e => e.id === event.id);
+                
+                    if (eventExists) {
+                        // Update the existing event
+                        return prevEvents.map(e => e.id === event.id ? event : e);
+                    } else {
+                        // Add the new event
+                        return [...prevEvents, event];
+                    }
+                });
+            }
         } catch (error) {
             console.error('Error updating event:', error);
         }
@@ -230,6 +252,7 @@ export function ScheduleProvider(props: { children: any }) {
 
     const value = {
         events: events,
+        localEvents,
         loading: false,
 
         addEvent: addEvent,

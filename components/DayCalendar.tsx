@@ -10,8 +10,8 @@ const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
 
 export default function DayCalendar() {
-  const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, date, editMode, setSettingWakeUpTime, wakeUpTime, fixedEvents } = useDashboard();
+  const { events, addEvent, removeEvent, loading, newEventData, localEvents } = useSchedule();
+  const { CreateEvent, date, editMode, setSettingWakeUpTime, wakeUpTime } = useDashboard();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
@@ -83,7 +83,7 @@ export default function DayCalendar() {
         ));
       }
 
-    return getLocalEvents(fixedEvents, wakeUpTime || new Date(0, 0, 0, 0, 0))
+    return getLocalEvents(localEvents, wakeUpTime || new Date(0, 0, 0, 0, 0))
       .filter((event) => ValidateEvent(event))
       .map((event, idx) => (
         <React.Fragment key={event.id}>

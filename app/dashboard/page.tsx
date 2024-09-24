@@ -55,9 +55,6 @@ interface DashboardContextType {
 
   editMode: boolean;
   setEditMode: (value: boolean) => void;
-
-  fixedEvents: ScheduleEvent[];
-  setFixedEvents: (value: ScheduleEvent[]) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -77,9 +74,6 @@ const DashboardContext = React.createContext<DashboardContextType>({
 
   editMode: false,
   setEditMode: () => {},
-
-  fixedEvents: [],
-  setFixedEvents: () => {},
 })
 
 
@@ -87,7 +81,7 @@ function MainContent() {
   // It's important to use the `useSchedule` hook inside the `ScheduleProvider` component
   const { events } = useSchedule();
 
-  const { newEventData, setNewEventData, } = useSchedule();
+  const { newEventData, setNewEventData } = useSchedule();
 
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
@@ -119,12 +113,6 @@ function MainContent() {
     }
   }, [user])
   
-
-  
-  const [fixedEvents, setFixedEvents] = useState<ScheduleEvent[]>(JSON.parse(JSON.stringify(Object.values(events))));
-  useEffect(() => {
-    setFixedEvents(JSON.parse(JSON.stringify(Object.values(events)))); // Deep copy);
-  }, [events]);
 
   const cookies = useCookies();
 
@@ -179,9 +167,6 @@ function MainContent() {
     setDate,
     editMode,
     setEditMode,
-
-    fixedEvents,
-    setFixedEvents,
   }
   
   return (
