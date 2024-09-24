@@ -1,6 +1,6 @@
 import { Calendar, Clock, ConciergeBell } from "lucide-react";
 
-const iconSize = 60;
+const iconSize = 30;
 
 export const features = [
     {
@@ -22,10 +22,5 @@ export const features = [
     icon: <Calendar size={iconSize} />,
     title: 'Priority Manager',
     description: 'Stay focused on what matters most. Set your event priorities, and let us handle the rest—rearranging less important tasks to make room for top goals.',
-    },
-    {
-    icon: <Calendar size={iconSize} />,
-    title: 'Real-Time Sync Across Devices',
-    description: 'Whether youre on your phone, tablet, or desktop, your schedule is always up-to-date. Real-time sync ensures youre always in control, no matter where you are.',
     },
 ];

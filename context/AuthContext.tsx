@@ -2,7 +2,7 @@
 
 import { auth, db } from '@/firebase'
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, User } from 'firebase/auth'
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDoc, getDocs, increment, setDoc, updateDoc } from 'firebase/firestore'
 import React, {useContext, useState, useEffect, use} from 'react'
 import { DefaultEvents } from './ScheduleContext'
 import { useRouter } from 'next/navigation'
@@ -104,7 +104,20 @@ export function AuthProvider(props: { children: any }) {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
-      });
+      }).then(async () => {
+        console.log('Updating stats');
+        const statsDocRef = doc(db, 'stats', 'stats');
+        await updateDoc(statsDocRef, {
+          user_count: increment(1),  // Incrementing the count by 1
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      }).then(() => {
+        router.push('/dashboard');
+      }); 
   }
 
   function login(email: string, password: string) {
