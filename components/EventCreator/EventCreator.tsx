@@ -23,6 +23,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useDashboard } from "@/app/dashboard/page"
 import { Trash } from "lucide-react"
 import AddEventType from "../AddEventType"
+import { Checkbox } from "../ui/checkbox"
 
 export interface AdvancedData {
   period?: EventPeriod

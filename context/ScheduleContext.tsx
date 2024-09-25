@@ -205,6 +205,8 @@ export function ScheduleProvider(props: { children: any }) {
                     ...prevEvents,
                     [event.id]: { ...prevEvents[event.id], ...event }
                 }));
+
+                setLocalEvents(prevEvents => prevEvents.filter(e => e.id !== event.id));
             } else {
                 if(!showedWarning) {
                     setShowedWarning(true)
