@@ -86,9 +86,6 @@ function MainContent() {
   const [creatingEvent, setCreatingEvent] = useState(false);
   const [isChangingDate, setIsChangingDate] = useState(false);
   const [settingWakeUpTime, setSettingWakeUpTime] = useState(false);
-  useEffect(() => {
-    console.log(settingWakeUpTime)
-  }, [settingWakeUpTime])
 
   const [date, setDate] = useState<Date>(new Date());
 

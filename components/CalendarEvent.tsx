@@ -118,7 +118,6 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
       {
         var newDuration = (resizePercent) / 100 * 24 * 60;
         const padding = 24 * 60 - (tempEvent.hour * 60 + tempEvent.minute);
-        console.log(padding);
         newDuration += padding;
       }
       else{

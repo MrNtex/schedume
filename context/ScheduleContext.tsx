@@ -109,6 +109,7 @@ export function ScheduleProvider(props: { children: any }) {
     const [loading, setLoading] = React.useState(true)
 
     const [newEventData, setNewEventData] = React.useState<ScheduleEvent>()
+    const [ showedWarning, setShowedWarning ] = React.useState(false)
 
     const { toast } = useToast()
 
@@ -166,8 +167,6 @@ export function ScheduleProvider(props: { children: any }) {
 
         fetchEvents();
 
-        console.log('Events:', events)
-
 
     }, [user])
 
@@ -182,8 +181,6 @@ export function ScheduleProvider(props: { children: any }) {
         const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
         await updateDoc(docRef, { id: docRef.id });
         setEvents(prevEvents => ({ ...prevEvents, [docRef.id]: { ...event, id: docRef.id } }))
-
-        console.log('Event added:', event)
     }
     
     const UpdateEvent = async (event: ScheduleEvent, localy: boolean = false) => {
@@ -196,7 +193,6 @@ export function ScheduleProvider(props: { children: any }) {
 
         ValidateEvent(event);
         try {
-            console.log("Localy: ", localy)
             if(!localy) {
 
                 const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
@@ -210,6 +206,13 @@ export function ScheduleProvider(props: { children: any }) {
                     [event.id]: { ...prevEvents[event.id], ...event }
                 }));
             } else {
+                if(!showedWarning) {
+                    setShowedWarning(true)
+                    toast({
+                        title: "Warning",
+                        description: "You are updating localy, this will not be saved to the server.",})
+                }
+
                 setLocalEvents(prevEvents => {
                     const eventExists = prevEvents.some(e => e.id === event.id);
                 
@@ -242,7 +245,6 @@ export function ScheduleProvider(props: { children: any }) {
                 return newEvents;
             });
 
-            console.log('Event removed:', id);
         } catch (error) {
             console.error('Error removing event:', error);
         }

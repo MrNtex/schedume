@@ -83,7 +83,7 @@ export function AuthProvider(props: { children: any }) {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.error(errorCode, errorMessage);
       })
       .then(() => {
         if (uid === '') {
@@ -103,9 +103,8 @@ export function AuthProvider(props: { children: any }) {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.error(errorCode, errorMessage);
       }).then(async () => {
-        console.log('Updating stats');
         const statsDocRef = doc(db, 'stats', 'stats');
         await updateDoc(statsDocRef, {
           user_count: increment(1),  // Incrementing the count by 1
@@ -114,7 +113,7 @@ export function AuthProvider(props: { children: any }) {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        console.error(errorCode, errorMessage);
       }).then(() => {
         router.push('/dashboard');
       }); 
@@ -147,7 +146,7 @@ export function AuthProvider(props: { children: any }) {
         const docSnap = await getDoc(docRef);
         let firebaseData = {};
         if (docSnap.exists()) {
-          console.log('Found user data:');
+          console.log('Found user data.');
           const data = docSnap.data();
   
           // Convert Firestore Timestamps to Date objects
@@ -162,7 +161,6 @@ export function AuthProvider(props: { children: any }) {
           };
         }
         setUserDataObj(firebaseData as UserData);
-        console.log(userDataObj);
   
         const eventsTypesCollection = collection(db, 'users', user.uid, 'event_types');
         const eventsTypesSnapshot = await getDocs(eventsTypesCollection);
@@ -177,16 +175,12 @@ export function AuthProvider(props: { children: any }) {
         console.log(err.message);
       } finally {
         setLoading(false);
-        console.log('Loading done');
-        console.log(userDataObj);
-        
       }
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    console.log('User data changed:', userDataObj);
     const fetchUserData = async () => {
       try {
         if (!user) {
@@ -196,7 +190,7 @@ export function AuthProvider(props: { children: any }) {
         setDoc(docRef, userDataObj)
       }
       catch (err: any) {
-        console.log(err.message)
+        console.error(err.message)
       }
     }
     fetchUserData()
@@ -221,7 +215,6 @@ export function AuthProvider(props: { children: any }) {
   }
 
   async function removeEventType(eventType: EventType) {
-    console.log('Removing event type:', eventType);
     if (!user) {
       return
     }
@@ -237,7 +230,7 @@ export function AuthProvider(props: { children: any }) {
       });
     }
     catch (err: any) {
-      console.log(err.message);
+      console.error(err.message);
     }
   }
   const value: AuthContextType = {

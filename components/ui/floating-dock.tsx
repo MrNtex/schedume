@@ -171,8 +171,6 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
-  console.log("Color", color);
-
   return (
     <div onClick={onClick}>
       <motion.div

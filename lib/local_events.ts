@@ -32,9 +32,7 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
             if(lastEndTime - startTime < last.duration / 2)
             {
               last.fixedDuration = last.duration;
-              console.log("Reducing duration of event: ", startTime, last.hour * 60 + last.minute, last.duration);
               last.duration = startTime - (last.hour * 60 + last.minute);
-              console.log("New duration: ", last.duration);
               endTime = startTime;
             }
           }

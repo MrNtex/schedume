@@ -18,7 +18,6 @@ export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
   const { CreateEvent, setChangingDate, editMode, setEditMode  } = useDashboard();
 
-  console.log("Edit Mode: ", editMode);
   const links = [
     {
       title: "New Event",

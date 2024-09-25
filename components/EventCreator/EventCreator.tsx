@@ -44,13 +44,10 @@ export function EventCreator() {
 
     if(newEventData?.id)
     {
-      UpdateEvent(newEventDataLocal)
+      UpdateEvent(newEventDataLocal, false)
     }else{
       addEvent(newEventDataLocal)
     }
-    
-
-    console.log('Event created:', newEventDataLocal)
   }
 
   function handleDeleteEvent() {

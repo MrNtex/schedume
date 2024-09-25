@@ -20,7 +20,6 @@ export default function WakeUpTimeModal() {
 
         setWakeUpTime(todayTime)
         setSettingWakeUpTime(false)
-        console.log('Wake up time set to: ', todayTime)
     }
 
     function Skip()
