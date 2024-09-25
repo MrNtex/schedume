@@ -12,6 +12,11 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
         endTime = startTime + element.duration;
         return;
       }
+
+      if (element.fixedDuration != null) {
+        element.duration = element.fixedDuration;
+        element.fixedDuration = undefined;
+      }
       
       if (startTime > endTime) {
         endTime = startTime + element.duration;
@@ -26,7 +31,10 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
             let lastEndTime = last.hour * 60 + last.minute + last.duration;
             if(lastEndTime - startTime < last.duration / 2)
             {
-              last.duration = startTime - last.hour * 60 + last.minute ;
+              last.fixedDuration = last.duration;
+              console.log("Reducing duration of event: ", startTime, last.hour * 60 + last.minute, last.duration);
+              last.duration = startTime - (last.hour * 60 + last.minute);
+              console.log("New duration: ", last.duration);
               endTime = startTime;
             }
           }

@@ -39,6 +39,8 @@ export class ScheduleEvent {
     minute: number = 0;
 
     duration: number = 60; // Duration in minutes
+    fixedDuration?: number = 60; // Duration in minutes
+
     eventPriority = EventPriority.Flexible;
     
     EventTypeID: number = -1; // -1 means no type selected
