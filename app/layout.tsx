@@ -41,7 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <CookiesProvider>
       <AuthProvider>
-      <body className={ 'flex flex-col w-full mx-auto text-sm sm:text-base min-h-screen justify-between' + inter.className}>
+      <body className={ 'flex flex-col w-full mx-auto text-sm sm:text-base justify-between' + inter.className}>
         <ThemeProvider attribute="class"
             defaultTheme="system"
             enableSystem

@@ -7,10 +7,11 @@ import { ShootingStars } from './ui/shooting-stars'
 import { StarsBackground } from './ui/stars-background'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 export default function Hero() {
 
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
 
   const router = useRouter();
 
@@ -19,6 +20,18 @@ export default function Hero() {
   }
 
   const MainButton = () => {
+    if (loading) {
+      return (
+        <button className="p-[3px] relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+          <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent flex items-center">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Loading...
+          </div>
+        </button>
+      )
+    }
+
     if (user) {
       return (
         <button className="p-[3px] relative" onClick={() => registerClick('./dashboard')}>
@@ -41,7 +54,7 @@ export default function Hero() {
   
   return (
     
-    <div className='flex flex-col items-center justify-center h-full min-h-screen'>
+    <div className='flex flex-col items-center justify-center h-full min-h-screen -mt-32'>
       
       <ShootingStars/>
       <StarsBackground />

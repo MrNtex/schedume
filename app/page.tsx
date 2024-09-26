@@ -1,4 +1,5 @@
-import ButtonSize from "@/components/ButtonSize";
+
+import FAQ from "@/components/FAQ";
 import Features from "@/components/Features";
 import Hero from "@/components/Hero";
 import Main from "@/components/Main";
@@ -10,7 +11,7 @@ export default function HomePage() {
     <Main>
       <Hero/>
       <Features/>
-      <ButtonSize/>
+      <FAQ/>
     </Main>
   );
 }

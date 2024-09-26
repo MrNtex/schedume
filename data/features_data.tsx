@@ -1,4 +1,4 @@
-import { Calendar, Clock, ConciergeBell } from "lucide-react";
+import { Award, Calendar, Clock, ConciergeBell } from "lucide-react";
 
 const iconSize = 30;
 
@@ -19,7 +19,7 @@ export const features = [
       description: 'Life happens—your schedule should understand that. Flexible time blocks let you handle unexpected events with ease.',
     },
     {
-    icon: <Calendar size={iconSize} />,
+    icon: <Award size={iconSize} />,
     title: 'Priority Manager',
     description: 'Stay focused on what matters most. Set your event priorities, and let us handle the rest—rearranging less important tasks to make room for top goals.',
     },
