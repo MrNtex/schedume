@@ -37,6 +37,7 @@ export class ScheduleEvent {
     description: string = '';
     hour: number = 12;
     minute: number = 0;
+    fixedTime?: number = undefined
 
     duration: number = 60; // Duration in minutes
     fixedDuration?: number = 60; // Duration in minutes

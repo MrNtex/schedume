@@ -2,14 +2,34 @@ import { EventPriority, ScheduleEvent } from "@/context/ScheduleContext";
 
 export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): ScheduleEvent[] {
 
+    const toMinutes = (event: ScheduleEvent): number => event.hour * 60 + event.minute;
+
     let endTime = (wakeUpTime?.getHours() ?? 0) * 60 + (wakeUpTime?.getMinutes() ?? 0);
 
     fixedEvents.sort((a, b) => (a.hour * 60 + a.minute) - (b.hour * 60 + b.minute));
 
     fixedEvents.forEach((element, index) => {
       let startTime = element.hour * 60 + element.minute;
+      //console.log("Event: ", element, "idx: ", index, "Start time: ", startTime, "End time: ", endTime);
       if (element.eventPriority == EventPriority.Fixed){
         endTime = startTime + element.duration;
+
+        let i = index - 1;
+        while (i >= 0 && toMinutes(fixedEvents[i]) + fixedEvents[i].duration > startTime) {
+          console.log("Duration: ", fixedEvents[i].duration)
+          if (fixedEvents[i].eventPriority == EventPriority.Flexible && startTime - toMinutes(fixedEvents[i]) > fixedEvents[i].duration / 2) {
+            fixedEvents[i].fixedDuration = fixedEvents[i].duration
+            fixedEvents[i].duration = startTime - toMinutes(fixedEvents[i]);
+            console.log("Flexible event duration reduced to ", fixedEvents[i].duration);
+            break;
+          }
+          fixedEvents[i].fixedTime = toMinutes(fixedEvents[i])
+          fixedEvents[i].hour = Math.floor(endTime / 60);
+          fixedEvents[i].minute = endTime % 60;
+          endTime += fixedEvents[i].duration;
+          i--;
+        }
+
         return;
       }
 
@@ -18,6 +38,13 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
         element.fixedDuration = undefined;
       }
       
+      if (element.fixedTime != null)
+      {
+        element.hour = Math.floor(element.fixedTime / 60);
+        element.minute = element.fixedTime % 60;
+        element.fixedTime = undefined;
+      }
+
       if (startTime > endTime) {
         endTime = startTime + element.duration;
       }
