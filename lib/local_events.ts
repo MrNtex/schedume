@@ -11,16 +11,20 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
     fixedEvents.forEach((element, index) => {
       let startTime = element.hour * 60 + element.minute;
       //console.log("Event: ", element, "idx: ", index, "Start time: ", startTime, "End time: ", endTime);
+      if (startTime > 24 * 60 || endTime > 24 * 60) {
+        return fixedEvents.slice(0, index);
+      }
+
+      console.log("Event: ", element, "idx: ", index, "Start time: ", startTime, "End time: ", endTime);
+
       if (element.eventPriority == EventPriority.Fixed){
         endTime = startTime + element.duration;
 
         let i = index - 1;
         while (i >= 0 && toMinutes(fixedEvents[i]) + fixedEvents[i].duration > startTime) {
-          console.log("Duration: ", fixedEvents[i].duration)
           if (fixedEvents[i].eventPriority == EventPriority.Flexible && startTime - toMinutes(fixedEvents[i]) > fixedEvents[i].duration / 2) {
             fixedEvents[i].fixedDuration = fixedEvents[i].duration
             fixedEvents[i].duration = startTime - toMinutes(fixedEvents[i]);
-            console.log("Flexible event duration reduced to ", fixedEvents[i].duration);
             break;
           }
           fixedEvents[i].fixedTime = toMinutes(fixedEvents[i])

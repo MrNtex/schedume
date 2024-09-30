@@ -149,20 +149,25 @@ export function ScheduleProvider(props: { children: any }) {
         const fetchEvents = async () => {
             // Fetch events from the server
             try {
-                const eventsCollection = collection(db, 'users', user.uid, 'events')
-                const eventsSnapshot = await getDocs(eventsCollection)
+            const eventsCollection = collection(db, 'users', user.uid, 'events')
+            const eventsSnapshot = await getDocs(eventsCollection)
 
-                const userEvents = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as unknown as ScheduleEvent[];
+            const userEvents = eventsSnapshot.docs.map(doc => {
+                const event = { id: doc.id, ...doc.data() } as ScheduleEvent;
+                event.fixedTime = undefined;
+                event.fixedDuration = undefined;
+                return event;
+            });
 
-                const eventsDictionary = userEvents.reduce((acc, Event) => {
+            const eventsDictionary = userEvents.reduce((acc, Event) => {
                 acc[Event.id] = Event;
                 return acc;
-                }, {} as Record<string, ScheduleEvent>);
-                setEvents(eventsDictionary)
+            }, {} as Record<string, ScheduleEvent>);
+            setEvents(eventsDictionary)
             } catch (error) {
-                console.error('Error fetching events:', error)
+            console.error('Error fetching events:', error)
             } finally {
-                setLoading(false)
+            setLoading(false)
             }
         }
 
