@@ -3,9 +3,10 @@
 import React, { useEffect } from "react";
 import { useContext } from "react";
 import { useAuth } from "./AuthContext";
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, CollectionReference, deleteDoc, doc, DocumentReference, getDocs, limit, query, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useToast } from '@/components/ui/use-toast'
+import { useCookies } from "next-client-cookies";
 
 export interface EventType {
     id: string;
@@ -114,6 +115,43 @@ export function ScheduleProvider(props: { children: any }) {
 
     const { toast } = useToast()
 
+    
+    const cookies = useCookies();
+
+    const activeCalendarCookie = cookies.get('activeCalendar');
+
+    const [activeCalendarID, setActiveCalendarID] = React.useState<string>(activeCalendarCookie || '');
+    useEffect(() => {
+        cookies.set('activeCalendar', activeCalendarID, { path: '/' });
+    }, [activeCalendarID]);
+    const [activeCalendarRef, setActiveCalendarRef] = React.useState<DocumentReference | null>(null);
+
+    useEffect(() => {
+        if (user && activeCalendarID) {
+            const calendarRef = doc(db, 'users', user.uid, 'calendars', activeCalendarID);
+            setActiveCalendarRef(calendarRef);
+        }
+    }, [user, activeCalendarID]);
+    
+    async function getActiveCalendar(): Promise<CollectionReference> {
+        if (!user) {
+            throw new Error('User not logged in');
+        }
+
+        const calendarCollection = collection(db, 'users', user.uid, 'calendars');
+        if (activeCalendarRef) {
+            return collection(activeCalendarRef, 'events');
+        } else {
+            const calendarSnapshot = await getDocs(query(calendarCollection, limit(1)));
+            if (!calendarSnapshot.empty) {
+                const calendarDoc = calendarSnapshot.docs[0];
+                return collection(calendarDoc.ref, 'events');
+            } else {
+                throw new Error('No active calendar found');
+            }
+        }
+    }
+
     function isFiniteNumber(value: any): boolean {
         // Check if the value is a finite number
         return typeof value === 'number' && Number.isFinite(value);
@@ -144,14 +182,14 @@ export function ScheduleProvider(props: { children: any }) {
             setEvents({}) // Clear events if user is not logged in
             return
         }
-        
+
         setLoading(true)
         const fetchEvents = async () => {
             // Fetch events from the server
             try {
-            const eventsCollection = collection(db, 'users', user.uid, 'events')
-            const eventsSnapshot = await getDocs(eventsCollection)
-
+            const eventsCollectionRef = await getActiveCalendar();
+            const eventsSnapshot = await getDocs(eventsCollectionRef);
+            
             const userEvents = eventsSnapshot.docs.map(doc => {
                 const event = { id: doc.id, ...doc.data() } as ScheduleEvent;
                 event.fixedTime = undefined;
@@ -184,7 +222,9 @@ export function ScheduleProvider(props: { children: any }) {
 
         ValidateEvent(event)
 
-        const docRef = await addDoc(collection(db, 'users', user.uid, 'events'), event)
+        const eventDocRef = await getActiveCalendar();
+
+        const docRef = await addDoc(eventDocRef, event)
         await updateDoc(docRef, { id: docRef.id });
         setEvents(prevEvents => ({ ...prevEvents, [docRef.id]: { ...event, id: docRef.id } }))
     }
@@ -201,9 +241,10 @@ export function ScheduleProvider(props: { children: any }) {
         try {
             if(!localy) {
 
-                const eventDocRef = doc(db, 'users', user.uid, 'events', event.id);
+                const eventColectionRef = await getActiveCalendar();
 
-                await updateDoc(eventDocRef, {
+                const eventDoc = doc(eventColectionRef, event.id);
+                await updateDoc(eventDoc, {
                     ...event
                 });
 

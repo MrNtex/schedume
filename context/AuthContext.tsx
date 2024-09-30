@@ -12,8 +12,7 @@ interface UserData {
   firstName: string;
   lastName: string;
   uid: string;
-
-  lastLogin: Date;
+  
   wakeUpTime: Date;
 }
 
@@ -98,6 +97,12 @@ export function AuthProvider(props: { children: any }) {
           await setDoc(eventDocRef, {
             ...event, // Storing the event details
           }, { merge: true });
+        });
+
+        const calendarsCollectionRef = collection(db, `users/${uid}/calendars`);
+        const calendarDocRef = doc(calendarsCollectionRef, 'default');
+        setDoc(calendarDocRef, {
+          name: 'Default',
         });
       })
       .catch((error) => {
