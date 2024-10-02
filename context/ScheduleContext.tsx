@@ -15,6 +15,11 @@ export interface EventType {
     color: string;
 }
 
+export interface CalendarType {
+    id: string;
+    name: string;
+}
+
 export const DefaultEvents: EventType[] = [
     { id:'0', name: 'Work', color: '#FF0000' },
     { id:'1', name: 'School', color: '#00FF00' },
@@ -38,10 +43,10 @@ export class ScheduleEvent {
     description: string = '';
     hour: number = 12;
     minute: number = 0;
-    fixedTime?: number = undefined
+    fixedTime: number | null = null
 
     duration: number = 60; // Duration in minutes
-    fixedDuration?: number = 60; // Duration in minutes
+    fixedDuration: number | null = null; // Duration in minutes
 
     eventPriority = EventPriority.Flexible;
     
@@ -75,6 +80,9 @@ interface ScheduleContextType {
     newEventData?: ScheduleEvent;
     setNewEventData: (event: ScheduleEvent) => void;
 
+    activeCalendarID: string;
+    setActiveCalendarID: (id: string) => void;
+
     debug: () => void;
 }
 
@@ -89,8 +97,11 @@ const ScheduleContext = React.createContext<ScheduleContextType>({
 
     UpdateEvent: async () => {},
 
-    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: EventPriority.Flexible, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]},
+    newEventData: {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: EventPriority.Flexible, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()], fixedTime: null, fixedDuration: null},
     setNewEventData: () => {},
+
+    activeCalendarID: '',
+    setActiveCalendarID: () => {},
 
     debug: () => {},
 })
@@ -192,8 +203,8 @@ export function ScheduleProvider(props: { children: any }) {
             
             const userEvents = eventsSnapshot.docs.map(doc => {
                 const event = { id: doc.id, ...doc.data() } as ScheduleEvent;
-                event.fixedTime = undefined;
-                event.fixedDuration = undefined;
+                event.fixedTime = null;
+                event.fixedDuration = null;
                 return event;
             });
 
@@ -315,6 +326,9 @@ export function ScheduleProvider(props: { children: any }) {
 
         newEventData: newEventData,
         setNewEventData: setNewEventData,
+
+        activeCalendarID: activeCalendarID,
+        setActiveCalendarID: setActiveCalendarID,
 
         debug: debug,
     }

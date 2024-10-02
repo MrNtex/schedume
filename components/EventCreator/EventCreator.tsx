@@ -38,7 +38,7 @@ export function EventCreator() {
 
   const { userEventTypes, removeEventType } = useAuth()
 
-  const [ newEventDataLocal, setNewEventDataLocal ] = React.useState<ScheduleEvent>(newEventData || {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: 0, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()]})
+  const [ newEventDataLocal, setNewEventDataLocal ] = React.useState<ScheduleEvent>(newEventData || {title: '', description: '', hour: 0, minute: 0, duration: 60, EventTypeID: -1, id: '', eventPriority: 0, period: EventPeriod.EveryDay, weekdays: [false, false, false, false, false, false, false], dateRange: [new Date(), new Date()], fixedTime: null, fixedDuration: null })
 
   function handleCreateEvent() {
     setCreatingEvent(false)

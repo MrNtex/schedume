@@ -13,10 +13,12 @@ import {
 import Image from "next/image";
 import { useSchedule } from "@/context/ScheduleContext";
 import { useDashboard } from "@/app/dashboard/page";
+import { Calendar, CalendarSearch } from "lucide-react";
+import { on } from "events";
 
 export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, setChangingDate, editMode, setEditMode  } = useDashboard();
+  const { CreateEvent, setChangingDate, editMode, setEditMode, setChangingCalendar  } = useDashboard();
 
   const links = [
     {
@@ -38,16 +40,16 @@ export function DashboardFloatingDock() {
     {
       title: "Go to Date",
       icon: (
-        <IconCalendar className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <CalendarSearch className="h-full w-full text-neutral-500 dark:text-neutral-300"  />
       ),
       onClick: () => { setChangingDate(true) }
     },
     {
-      title: "Changelog",
+      title: "Change calendar",
       icon: (
-        <IconExchange className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <Calendar className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
+      onClick: () => { setChangingCalendar(true) }
     },
 
     {

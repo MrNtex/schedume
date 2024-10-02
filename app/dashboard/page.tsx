@@ -13,6 +13,7 @@ import WakeUpTimeModal from '@/components/WakeUpTimeModal'
 import { useCookies } from 'next-client-cookies';
 import { getLocalEvents } from '@/lib/local_events'
 import { set } from 'date-fns'
+import CalendarPicker from '@/components/CalendarPicker'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -55,6 +56,9 @@ interface DashboardContextType {
 
   editMode: boolean;
   setEditMode: (value: boolean) => void;
+
+  changingCalendar: boolean;
+  setChangingCalendar: (value: boolean) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -74,6 +78,9 @@ const DashboardContext = React.createContext<DashboardContextType>({
 
   editMode: false,
   setEditMode: () => {},
+
+  changingCalendar: false,
+  setChangingCalendar: () => {},
 })
 
 
@@ -120,6 +127,7 @@ function MainContent() {
     cookies.set('editMode', editMode.toString(), { path: '/' });
   }, [editMode]);
   
+  const [changingCalendar, setChangingCalendar] = useState(false);
 
   function CreateEvent(event?: ScheduleEvent) {
     setCreatingEvent(true)
@@ -134,6 +142,8 @@ function MainContent() {
         EventTypeID: event?.EventTypeID || -1,
         period: event?.period || EventPeriod.EveryDay,
         eventPriority: event?.eventPriority || EventPriority.Flexible,
+        fixedDuration: event?.fixedDuration || null,
+        fixedTime: event?.fixedTime || null,
     })
   }
 
@@ -164,6 +174,9 @@ function MainContent() {
     setDate,
     editMode,
     setEditMode,
+
+    changingCalendar,
+    setChangingCalendar,
   }
   
   return (
@@ -183,6 +196,11 @@ function MainContent() {
         {isChangingDate && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <DatePickerModal />
+          </div>
+        )}
+        {changingCalendar && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <CalendarPicker />
           </div>
         )}
 

@@ -15,8 +15,6 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
         return fixedEvents.slice(0, index);
       }
 
-      console.log("Event: ", element, "idx: ", index, "Start time: ", startTime, "End time: ", endTime);
-
       if (element.eventPriority == EventPriority.Fixed){
         endTime = startTime + element.duration;
 
@@ -39,14 +37,14 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
 
       if (element.fixedDuration != null) {
         element.duration = element.fixedDuration;
-        element.fixedDuration = undefined;
+        element.fixedDuration = null;
       }
       
       if (element.fixedTime != null)
       {
         element.hour = Math.floor(element.fixedTime / 60);
         element.minute = element.fixedTime % 60;
-        element.fixedTime = undefined;
+        element.fixedTime = null;
       }
 
       if (startTime > endTime) {
