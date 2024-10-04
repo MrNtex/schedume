@@ -60,6 +60,9 @@ interface DashboardContextType {
 
   changingCalendar: boolean;
   setChangingCalendar: (value: boolean) => void;
+
+  fetchingGoogleEvents: boolean;
+  setFetchingGoogleEvents: (value: boolean) => void;
 }
 
 const DashboardContext = React.createContext<DashboardContextType>({
@@ -82,6 +85,9 @@ const DashboardContext = React.createContext<DashboardContextType>({
 
   changingCalendar: false,
   setChangingCalendar: () => {},
+
+  fetchingGoogleEvents: false,
+  setFetchingGoogleEvents: () => {},
 })
 
 
@@ -181,6 +187,9 @@ function MainContent() {
 
     changingCalendar,
     setChangingCalendar,
+
+    fetchingGoogleEvents,
+    setFetchingGoogleEvents
   }
   
   return (
@@ -208,7 +217,9 @@ function MainContent() {
           </div>
         )}
         {fetchingGoogleEvents && (
-          <GoogleCalendar />
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <GoogleCalendar />
+          </div>
         )}
 
 
