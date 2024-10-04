@@ -136,13 +136,6 @@ export function ScheduleProvider(props: { children: any }) {
         cookies.set('activeCalendar', activeCalendarID, { path: '/' });
     }, [activeCalendarID]);
     const [activeCalendarRef, setActiveCalendarRef] = React.useState<DocumentReference | null>(null);
-
-    useEffect(() => {
-        if (user && activeCalendarID) {
-            const calendarRef = doc(db, 'users', user.uid, 'calendars', activeCalendarID);
-            setActiveCalendarRef(calendarRef);
-        }
-    }, [user, activeCalendarID]);
     
     async function getActiveCalendar(): Promise<CollectionReference> {
         if (!user) {
@@ -150,8 +143,9 @@ export function ScheduleProvider(props: { children: any }) {
         }
 
         const calendarCollection = collection(db, 'users', user.uid, 'calendars');
-        if (activeCalendarRef) {
-            return collection(activeCalendarRef, 'events');
+
+        if (activeCalendarID) {
+            return collection(db, 'users', user.uid, 'calendars', activeCalendarID, 'events');
         } else {
             const calendarSnapshot = await getDocs(query(calendarCollection, limit(1)));
             if (!calendarSnapshot.empty) {
@@ -194,6 +188,8 @@ export function ScheduleProvider(props: { children: any }) {
             return
         }
 
+        console.log(activeCalendarID)
+
         setLoading(true)
         const fetchEvents = async () => {
             // Fetch events from the server
@@ -222,8 +218,7 @@ export function ScheduleProvider(props: { children: any }) {
 
         fetchEvents();
 
-
-    }, [user])
+    }, [user, activeCalendarID])
 
 
     const addEvent = async (event: ScheduleEvent) => {

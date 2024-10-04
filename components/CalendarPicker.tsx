@@ -10,6 +10,7 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { useAuth } from '@/context/AuthContext'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import CalendarPopup from './CalendarPopup'
 
 
 export default function CalendarPicker() {
@@ -63,12 +64,13 @@ export default function CalendarPicker() {
             {calendars.map(calendar => (
                 <SelectItem key={calendar.id} value={calendar.id}>{calendar.name}</SelectItem>
             ))}
+            <CalendarPopup/>
             </SelectContent>
             </Select>
         </form>
         </CardContent>
-        <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setChangingCalendar(false)}>Cancel</Button>
+        <CardFooter className="flex justify-center items-center">
+            <Button variant="outline" onClick={() => setChangingCalendar(false)}>OK</Button>
         </CardFooter>
     </Card>
   )
