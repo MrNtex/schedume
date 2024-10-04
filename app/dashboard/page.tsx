@@ -14,6 +14,7 @@ import { useCookies } from 'next-client-cookies';
 import { getLocalEvents } from '@/lib/local_events'
 import { set } from 'date-fns'
 import CalendarPicker from '@/components/CalendarPicker'
+import GoogleCalendar from '@/components/GoogleCalendar'
 
 export function useDashboard() {
   return React.useContext(DashboardContext)
@@ -98,6 +99,9 @@ function MainContent() {
 
   const { user, userDataObj, setUserDataObj } = useAuth()
   const [wakeUpTime, setWakeUpTime] = React.useState<Date>(userDataObj?.wakeUpTime || new Date())
+
+  const [fetchingGoogleEvents, setFetchingGoogleEvents] = useState(true)
+
   useEffect(() => {
     if (user == null) return
     if (userDataObj == null) return
@@ -203,6 +207,10 @@ function MainContent() {
             <CalendarPicker />
           </div>
         )}
+        {fetchingGoogleEvents && (
+          <GoogleCalendar />
+        )}
+
 
         <DayCalendar />
         <DashboardFloatingDock />
