@@ -160,6 +160,8 @@ const GoogleCalendar = () => {
           const startDate = new Date(startDateTime);
           const endDate = new Date(endDateTime);
 
+          console.log("Start Date: ", startDate, "End Date: ", endDate);
+
           const parsedEvent = parseToScheduleEvent(event, startDate, endDate);
           return parsedEvent;
         });

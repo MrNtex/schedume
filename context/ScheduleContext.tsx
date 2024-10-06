@@ -188,8 +188,6 @@ export function ScheduleProvider(props: { children: any }) {
             return
         }
 
-        console.log(activeCalendarID)
-
         setLoading(true)
         const fetchEvents = async () => {
             // Fetch events from the server
@@ -215,8 +213,9 @@ export function ScheduleProvider(props: { children: any }) {
             setLoading(false)
             }
         }
-
         fetchEvents();
+
+        console.log('Active calendar ID:', events)
 
     }, [user, activeCalendarID])
 
