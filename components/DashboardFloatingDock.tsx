@@ -2,6 +2,7 @@ import React from "react";
 import { FloatingDock } from "@/components/ui/floating-dock";
 import {
   IconBrandGithub,
+  IconBrandGoogle,
   IconBrandX,
   IconCalendar,
   IconExchange,
@@ -18,7 +19,7 @@ import { on } from "events";
 
 export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, setChangingDate, editMode, setEditMode, setChangingCalendar  } = useDashboard();
+  const { CreateEvent, setChangingDate, editMode, setEditMode, setChangingCalendar, setFetchingGoogleEvents  } = useDashboard();
 
   const links = [
     {
@@ -53,18 +54,11 @@ export function DashboardFloatingDock() {
     },
 
     {
-      title: "Twitter",
+      title: "Import from Google",
       icon: (
-        <IconBrandX className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <IconBrandGoogle className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "#",
-    },
-    {
-      title: "GitHub",
-      icon: (
-        <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: "#",
+      onClick: () => { setFetchingGoogleEvents(true) },
     },
   ];
   return (

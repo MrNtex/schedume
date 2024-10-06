@@ -106,7 +106,7 @@ function MainContent() {
   const { user, userDataObj, setUserDataObj } = useAuth()
   const [wakeUpTime, setWakeUpTime] = React.useState<Date>(userDataObj?.wakeUpTime || new Date())
 
-  const [fetchingGoogleEvents, setFetchingGoogleEvents] = useState(true)
+  const [fetchingGoogleEvents, setFetchingGoogleEvents] = useState(false)
 
   useEffect(() => {
     if (user == null) return

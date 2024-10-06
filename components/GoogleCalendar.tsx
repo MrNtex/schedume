@@ -11,6 +11,7 @@ import { RRule } from 'rrule';
 import { addDoc, collection, writeBatch, doc } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { useAuth } from '@/context/AuthContext';
+import parseToScheduleEvent from '@/lib/parse_to_schedule_event';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID; // Replace with your Client ID
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY; // Replace with your API Key
@@ -93,55 +94,54 @@ const GoogleCalendar = () => {
   };
 
   // Function to apply the new calendar
-    const applyCalendar = (calendarId: string) => {
-        const events = fetchEventsForSelectedCalendar(calendarId);
+    const applyCalendar = async (calendarId: string) => {
+      try {
+          const parsed_events = await fetchEventsForSelectedCalendar(calendarId); // Await the promise
 
-        async function handleSubmit() {
-            try {
-                if (!user) throw new Error('User not found');
-                const name = calendars.find(calendar => calendar.id === calendarId)?.summary;
+          console.log('Applying calendar:', parsed_events);
 
-                const calendarsCollectionRef = collection(db, `users/${user.uid}/calendars`);
-                const docRef = await addDoc(calendarsCollectionRef, { name: name});
+          if (!user) throw new Error('User not found');
+          const name = calendars.find(calendar => calendar.id === calendarId)?.summary;
 
-                setActiveCalendarID(docRef.id);
-                
-                const eventsCollectionRef = collection(db, `users/${user.uid}/calendars/${docRef.id}/events`);
+          const calendarsCollectionRef = collection(db, `users/${user.uid}/calendars`);
+          const docRef = await addDoc(calendarsCollectionRef, { name: name });
 
-                const batch = writeBatch(db);
-    
-                // Loop through the events and add each one to the batch
-                for (const event of events) {
-                const eventDocRef = doc(eventsCollectionRef, event.id); // Create a new document reference
-                batch.set(eventDocRef, {
-                    id: event.id,
-                    title: event.title,
-                    description: event.description,
-                    duration: event.duration,
-                    hour: event.hour,
-                    minute: event.minute,
-                    dateRange: event.dateRange,
-                    period: event.period,
-                    weekdays: event.weekdays,
-                });
+          setActiveCalendarID(docRef.id);
 
-                // Commit the batch
-                await batch.commit();
-                }
-            }
-            catch (error) {
-                console.error('Error applying calendar:', error);
-            }
-        }
+          const eventsCollectionRef = collection(db, `users/${user.uid}/calendars/${docRef.id}/events`);
 
+          const batch = writeBatch(db);
 
+          // Loop through the events and add each one to the batch
+          for (const event of parsed_events) { // Use parsed_events here
+              const eventDocRef = doc(eventsCollectionRef, event.id); // Create a new document reference
+              batch.set(eventDocRef, {
+                  id: event.id,
+                  title: event.title,
+                  description: event.description,
+                  duration: event.duration,
+                  hour: event.hour,
+                  minute: event.minute,
+                  dateRange: event.dateRange,
+                  period: event.period,
+                  weekdays: event.weekdays,
+              });
+          }
 
-        setChangingCalendar(false);
-    }
+          // Commit the batch
+          await batch.commit();
+
+      } catch (error) {
+          console.error('Error applying calendar:', error);
+      } finally {
+          setChangingCalendar(false); // Make sure to set changingCalendar to false
+      }
+  };
+
 
   // Function to fetch events for the selected calendar
-  const fetchEventsForSelectedCalendar = (calendarId: string): ScheduleEvent[] => {
-    gapi.client.calendar.events
+  const fetchEventsForSelectedCalendar = (calendarId: string): Promise<ScheduleEvent[]> => {
+    return gapi.client.calendar.events
       .list({
         calendarId,
         timeMin: new Date().toISOString(),
@@ -153,72 +153,23 @@ const GoogleCalendar = () => {
       .then((response: { result: { items: any[]; }; }) => {
         const scheduleEvents: ScheduleEvent[] = (response.result.items || []).map(event => {
 
-          
-          
-          
           // Extract and parse start and end times
           const startDateTime = event.start.dateTime || event.start.date;
           const endDateTime = event.end.dateTime || event.end.date;
-  
+
           const startDate = new Date(startDateTime);
           const endDate = new Date(endDateTime);
-  
-          // Calculate duration in minutes
-          const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60));
-  
-          // Create a new ScheduleEvent
-          const scheduleEvent = new ScheduleEvent(startDate.getHours(), startDate.getMinutes());
-          
-          
-          // Set properties
-          scheduleEvent.id = event.id;
-          scheduleEvent.title = event.summary || '';
-          scheduleEvent.description = event.description || ''; // Assuming you want to include description if available
-          scheduleEvent.hour = startDate.getHours();
-          scheduleEvent.minute = startDate.getMinutes();
 
-          scheduleEvent.duration = duration;
-          scheduleEvent.dateRange = [startDate, endDate];
-
-          
-            if(event.recurrence)
-            {
-                const rrule =  RRule.fromString(event.recurrence[0]);
-                const freq = rrule.options.freq;
-                // Determine the EventPeriod
-                if (freq === RRule.DAILY) {
-                    // Single day event
-                    scheduleEvent.period = EventPeriod.EveryDay;
-                } else if (freq === RRule.WEEKLY) {
-                    
-                    // Recurring event
-                    const weekdays = rrule.options.byweekday;
-                    scheduleEvent.period = EventPeriod.WeekRange;
-                    scheduleEvent.weekdays = [false, false, false, false, false, false, false];
-                    for (const weekday of weekdays) {
-                    scheduleEvent.weekdays[weekday] = true;
-                    }
-                }
-                else {
-                    // TODO: Handle other frequencies
-                    scheduleEvent.period = EventPeriod.EveryDay;
-                }
-            }
-            else{
-                scheduleEvent.period = EventPeriod.Custom;
-                scheduleEvent.dateRange = [startDate, endDate];
-            }
-          
-  
-          return scheduleEvent;
+          const parsedEvent = parseToScheduleEvent(event, startDate, endDate);
+          return parsedEvent;
         });
-  
         return scheduleEvents;
       })
       .catch((error: any) => {
         console.error('Error fetching events:', error);
+        return [];
       });
-      return [];
+      
   };
   
   
