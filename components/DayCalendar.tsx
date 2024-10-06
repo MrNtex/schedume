@@ -5,6 +5,7 @@ import { useDashboard } from '@/app/dashboard/page';
 import { ScheduleEvent } from '@/context/ScheduleContext';
 import HourOnDayCalendar from './HourOnDayCalendar';
 import { getLocalEvents } from '@/lib/local_events';
+import { Timestamp } from 'firebase/firestore';
 
 const hours = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
@@ -59,10 +60,13 @@ export default function DayCalendar() {
         return event.weekdays[(date.getDay()+6)%7];
       case EventPeriod.Custom:
         if (event.dateRange == null) {
-          console.log('Invalid Event DateRange');
+          console.log('Invalid Event DateRange for ', event);
           return false;
         }
-        return date >= event.dateRange[0] && date <= event.dateRange[1];
+        const start = event.dateRange[0] as any as Timestamp;
+        const end = event.dateRange[1] as any as Timestamp;
+        
+        return date >= start.toDate() && date <= end.toDate();
     }
 
     return true;

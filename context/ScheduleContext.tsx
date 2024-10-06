@@ -199,6 +199,7 @@ export function ScheduleProvider(props: { children: any }) {
                 const event = { id: doc.id, ...doc.data() } as ScheduleEvent;
                 event.fixedTime = null;
                 event.fixedDuration = null;
+                
                 return event;
             });
 

@@ -24,12 +24,19 @@ import {
 
 export function DatePickerWithRange({
   className,
+  onDateChange,
 }: {
+  className?: string;
+  onDateChange: (date: DateRange) => void;
 } & React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 7),
   })
+  React.useEffect(() => {
+    if (!date) return
+    onDateChange(date)
+  }, [date])
 
   return (
     

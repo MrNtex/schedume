@@ -6,6 +6,7 @@ import { Input } from '../ui/input';
 import WeekRangeSelector from './WeekRangeSelector';
 import { DatePickerWithRange } from '../ui/datepicker';
 import { EventPeriod, ScheduleEvent } from '@/context/ScheduleContext';
+import { DateRange } from 'react-day-picker';
 
 export default function EventCreatorAdvanced({
     event,
@@ -46,8 +47,14 @@ export default function EventCreatorAdvanced({
         break
       case 'More':
         setPeriod(EventPeriod.Custom)
+        setEvent({...event, dateRange: [new Date(), new Date()] as [Date, Date]})
         break
     }
+  }
+
+  function handleDateRangeChange(dateRange: DateRange) {
+    console.log(dateRange)
+    setEvent({...event, dateRange: [dateRange.from, dateRange.to] as [Date, Date]})
   }
 
   return (
@@ -67,7 +74,7 @@ export default function EventCreatorAdvanced({
             </SelectContent>
         </Select>
 
-        {period === EventPeriod.Custom && <DatePickerWithRange/>}
+        {period === EventPeriod.Custom && <DatePickerWithRange onDateChange={handleDateRangeChange}/>}
         {period === EventPeriod.WeekRange && <WeekRangeSelector day1={0} day2={4} updateRange={setSelectedWeekdays}/>}
         {period === EventPeriod.Weekday && <WeekRangeSelector day1={(new Date().getDay()+6)%7} day2={(new Date().getDay()+6)%7} updateRange={setSelectedWeekdays}/>}
         
