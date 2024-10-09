@@ -139,6 +139,8 @@ const GoogleCalendar = () => {
   };
 
 
+  const MAX_GOOGLE_EVENTS = 256;
+
   // Function to fetch events for the selected calendar
   const fetchEventsForSelectedCalendar = (calendarId: string): Promise<ScheduleEvent[]> => {
     return gapi.client.calendar.events
@@ -147,8 +149,8 @@ const GoogleCalendar = () => {
         timeMin: new Date().toISOString(),
         showDeleted: false,
         singleEvents: false, // Set singleEvents to false to get the original events
-        maxResults: 32,
-        //orderBy: 'startTime',
+        maxResults: MAX_GOOGLE_EVENTS,
+        //orderBy: 'startTime',n
       })
       .then((response: { result: { items: any[]; }; }) => {
         const scheduleEvents: ScheduleEvent[] = (response.result.items || []).map(event => {

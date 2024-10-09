@@ -48,6 +48,10 @@ export default function DayCalendar() {
       return false;
     }
 
+    function stripTime(date: Date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
     switch (event.period) {
       case EventPeriod.EveryDay:
         return true;
@@ -66,7 +70,14 @@ export default function DayCalendar() {
         const start = event.dateRange[0] as any as Timestamp;
         const end = event.dateRange[1] as any as Timestamp;
         
-        return date >= start.toDate() && date <= end.toDate();
+        const startTimestamp = new Timestamp(start.seconds, start.nanoseconds);
+        const endTimestamp = new Timestamp(end.seconds, end.nanoseconds);
+
+        const startDay = stripTime(startTimestamp.toDate());
+        const endDay = stripTime(endTimestamp.toDate());
+        const currentDay = stripTime(date);
+        
+        return currentDay >= startDay && currentDay <= endDay;
     }
 
     return true;
@@ -87,8 +98,7 @@ export default function DayCalendar() {
         ));
       }
 
-    return getLocalEvents(localEvents, wakeUpTime || new Date(0, 0, 0, 0, 0))
-      .filter((event) => ValidateEvent(event))
+    return getLocalEvents(localEvents.filter((event) => ValidateEvent(event)), wakeUpTime || new Date(0, 0, 0, 0, 0))
       .map((event, idx) => (
         <React.Fragment key={event.id}>
           <CalendarEvent event={event} partial={false} />

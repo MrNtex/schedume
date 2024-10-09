@@ -71,6 +71,8 @@ export function getLocalEvents(fixedEvents: ScheduleEvent[], wakeUpTime: Date): 
         startTime = element.hour * 60 + element.minute;
         endTime = startTime + element.duration;
       }
+
+      console.log("Event: ", element, "Start time: ", startTime, "End time: ", endTime);
     });
 
     return fixedEvents

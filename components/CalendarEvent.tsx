@@ -197,11 +197,13 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
   }
 
   const EventInsides = () => {
+    const textOverFlow = event.title.length > 20 ? 'overflow-ellipsis' : '';
+
     if(getHeight() > 5)
     {
       return (
         <div className="flex justify-between left-0">
-          <h1 className="text-white text-3xl font-bold p-4">{event.title}</h1>
+          <h1 className={`text-white font-bold p-4 truncate ${textOverFlow ? 'text-xl' : 'text-3xl'}`}>{event.title}</h1>
           <h1 className="text-white text-lg p-4">
             {getTime()}
           </h1>
@@ -212,7 +214,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     {
       return (
         <div className="absolute flex justify-between items-center left-0 top-0 px-4 w-full h-full">
-          <h1 className="text-white text-xl font-bold align-middle ">{event.title}</h1>
+          <h1 className="text-white text-xl font-bold align-middle truncate">{event.title}</h1>
           <h1 className="text-white text-md">{getTime()}</h1>
         </div>
       )
