@@ -5,7 +5,7 @@ import { Lock } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable';
 
-export default function CalendarEvent({ event, partial }: { event: ScheduleEvent, partial: boolean }) {
+export default function CalendarEvent({ event, partial, currentTime }: { event: ScheduleEvent, partial: boolean, currentTime: Date }) {
   const [position, setPosition] = useState((event.hour * 60 + event.minute) / (24 * 60) * 100); // Initial position based on event time
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -197,25 +197,35 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
   }
 
   const EventInsides = () => {
-    const textOverFlow = event.title.length > 20 ? 'overflow-ellipsis' : '';
 
-    if(getHeight() > 5)
+    const h = getHeight();
+
+    if(h > 5)
     {
       return (
-        <div className="flex justify-between left-0">
-          <h1 className={`text-white font-bold p-4 truncate ${textOverFlow ? 'text-xl' : 'text-3xl'}`}>{event.title}</h1>
-          <h1 className="text-white text-lg p-4">
-            {getTime()}
-          </h1>
+        <div className='h-full flex flex-col'>
+          <div className="flex justify-between left-0 items-center h-full w-full">
+            <h1 className={`text-white font-bold px-1 truncate text-xl`}>{event.title}</h1>
+            <h1 className="text-white text-lg p-4">
+              {getTime()}
+            </h1>
+          </div>
+          {
+            h > 10 && <p className="text-white text-lg px-1 pb-4">Event details</p>// Only show event details if the event is big enough
+          }
         </div>
+        
       )
     }
-    else if(getHeight() > 2)
+    else if(h > 2)
     {
       return (
-        <div className="absolute flex justify-between items-center left-0 top-0 px-4 w-full h-full">
-          <h1 className="text-white text-xl font-bold align-middle truncate">{event.title}</h1>
-          <h1 className="text-white text-md">{getTime()}</h1>
+        <div className="absolute left-0 top-0 px-6 w-full h-full">
+          <div className="flex justify-between items-center w-full h-full">
+            <h1 className="text-white text-xl font-bold align-middle truncate">{event.title}</h1>
+            <h1 className="text-white text-md">{getTime()}</h1>
+          </div>
+          
         </div>
       )
     }
@@ -230,7 +240,7 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
     >
       <div
         ref={eventRef} // Reference to the draggable element
-        className={`absolute rounded-xl px-5 w-[40%] ${event.eventPriority == EventPriority.Fixed ? 'border-4 border-emerald-100' : ''} ${isDragging ? 'brightness-50' : ''}`}
+        className={`absolute rounded-xl px-5 w-[40%] ${currentTime && event.hour * 60 + event.minute + event.duration < currentTime.getHours() * 60 + currentTime.getMinutes() && "opacity-60"} ${event.eventPriority == EventPriority.Fixed ? 'border-4 border-emerald-100' : ''} ${isDragging ? 'brightness-50' : ''}`}
         style={{
           top: `${getTop()}%`,
           height: `${getHeight()}%`,
@@ -249,10 +259,6 @@ export default function CalendarEvent({ event, partial }: { event: ScheduleEvent
         </DraggableCore>
 
         <EventInsides/>
-        
-        {
-          getHeight() > 10 && <p className="text-white text-lg p-4">Event details</p>// Only show event details if the event is big enough
-        }
         
 
         
