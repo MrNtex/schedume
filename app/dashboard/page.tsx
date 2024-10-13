@@ -136,7 +136,11 @@ function MainContent() {
   useEffect(() => {
     cookies.set('editMode', editMode.toString(), { path: '/' });
   }, [editMode]);
-  
+  useEffect(() => {
+    if (date.toDateString() != new Date().toDateString()) {
+      setEditMode(true);
+    }
+  }, [date]);
   const [changingCalendar, setChangingCalendar] = useState(false);
 
   function CreateEvent(event?: ScheduleEvent) {

@@ -84,19 +84,19 @@ export default function DayCalendar() {
   }
 
   const Events = () => {
-      if (currentTime.getDate() !== date.getDate() || editMode) {
-  
-        return Object.values(events)
-        .filter((event: ScheduleEvent) => ValidateEvent(event as ScheduleEvent))
-        .map((event: ScheduleEvent) => (
-          <React.Fragment key={event.id}>
-            <CalendarEvent event={event} partial={false} currentTime={currentTime}/>
-            {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
-              <CalendarEvent event={event} partial={true} currentTime={currentTime} />
-            )}
-          </React.Fragment>
-        ));
-      }
+    if (editMode) {
+
+      return Object.values(events)
+      .filter((event: ScheduleEvent) => ValidateEvent(event as ScheduleEvent))
+      .map((event: ScheduleEvent) => (
+        <React.Fragment key={event.id}>
+          <CalendarEvent event={event} partial={false} currentTime={currentTime}/>
+          {event.hour * 60 + event.minute + event.duration > 24 * 60 && (
+            <CalendarEvent event={event} partial={true} currentTime={currentTime} />
+          )}
+        </React.Fragment>
+      ));
+    }
 
     return getLocalEvents(localEvents.filter((event) => ValidateEvent(event)), wakeUpTime || new Date(0, 0, 0, 0, 0))
       .map((event, idx) => (

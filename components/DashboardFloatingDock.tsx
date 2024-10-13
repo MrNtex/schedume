@@ -19,7 +19,18 @@ import { on } from "events";
 
 export function DashboardFloatingDock() {
   const { events, addEvent, removeEvent, loading, newEventData } = useSchedule();
-  const { CreateEvent, setChangingDate, editMode, setEditMode, setChangingCalendar, setFetchingGoogleEvents  } = useDashboard();
+  const { CreateEvent, setChangingDate, editMode, setEditMode, setChangingCalendar, setFetchingGoogleEvents, date  } = useDashboard();
+
+  function GetEditModeColor() {
+    if (date.toDateString() !== new Date().toDateString()) {
+      // You can't edit localy stored events on other days
+      return "bg-gray-700 dark:bg-gray-700 opacity-30 cursor-not-allowed";
+    }
+    if (editMode) {
+      return "bg-emerald-500 dark:bg-emerald-600";
+    }
+    return undefined;
+  }
 
   const links = [
     {
@@ -35,8 +46,8 @@ export function DashboardFloatingDock() {
       icon: (
         <IconTerminal2 className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      color: editMode ? "bg-emerald-500 dark:bg-emerald-600" : undefined,
-      onClick: () => { setEditMode(!editMode) }
+      color: GetEditModeColor(),
+      onClick: () => { date.toDateString() === new Date().toDateString() ? setEditMode(!editMode) : null }
     },
     {
       title: "Go to Date",
