@@ -29,7 +29,7 @@ ScheduMe is an adaptable calendar app, that dynamically adjusts to your day.
     </td>
     <td>
       <img src="Screenshots/3.png" width="400">
-      <div align="center">Creating events</div>
+      <div align="center">Accounts system</div>
     </td>
   </tr>
   <tr>
@@ -39,7 +39,7 @@ ScheduMe is an adaptable calendar app, that dynamically adjusts to your day.
     </td>
     <td>
       <img src="Screenshots/1.png" width="400">
-      <div align="center">Hero page</div>
+      <div align="center">Creating Events</div>
     </td>
   </tr>
 </table>
