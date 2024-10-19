@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import React from 'react'
+import React, { useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { CalendarIcon } from 'lucide-react'
 import { Button } from './ui/button'
@@ -26,16 +26,18 @@ function HexColorPickerPop({ color, onChange }: { color: string, onChange: (colo
 }
 
 export default function AddEventType() {
-    const [color, setColor] = React.useState("#fff")
-    const [name, setName] = React.useState("New event type")
+    const [isOpen, setIsOpen] = useState(false);
+    const [color, setColor] = useState("#fff")
+    const [name, setName] = useState("New event type")
 
     const { userEventTypes, addUserEventType } = useAuth()
     function handleSubmit(e: React.FormEvent) {
-        addUserEventType({ name, color })
+        addUserEventType({ name, color });
+        setIsOpen(false);
     }
     return (
         <div className="grid gap-2 w-full max-w-md mx-auto"> {/* Added max width for layout control */}
-            <Popover>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
                     <Button
                         id="date"

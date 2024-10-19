@@ -21,10 +21,10 @@ export interface CalendarType {
 }
 
 export const DefaultEvents: EventType[] = [
-    { id:'0', name: 'Work', color: '#FF0000' },
-    { id:'1', name: 'School', color: '#00FF00' },
-    { id:'2', name: 'Excercise', color: '#0000FF' },
-    { id:'3', name: 'Liesure', color: '#FFFF00' },
+    { id:'0', name: 'Work', color: '#db524d' },
+    { id:'1', name: 'School', color: '#ebc444' },
+    { id:'2', name: 'Excercise', color: '#434884' },
+    { id:'3', name: 'Liesure', color: '#69d16e' },
 ]
 export enum EventPeriod {
     EveryDay,
