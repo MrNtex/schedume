@@ -46,7 +46,7 @@ export default function AddEventType() {
                         Add more...
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent side='top' className="w-full max-w-md">
+                <PopoverContent side='top' className="w-full max-w-md" onInteractOutside={(e) => e.preventDefault()} onFocusOutside={(e) => e.preventDefault()}>
                     <div className='flex justify-center flex-col items-center'>
                         <span className="block mb-2">Add new event type</span>
                         <div className='flex items-center gap-5 p-4'>

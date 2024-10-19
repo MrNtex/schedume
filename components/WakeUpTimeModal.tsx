@@ -30,12 +30,12 @@ export default function WakeUpTimeModal() {
     return (
     <Card>
         <CardHeader>
-        <CardTitle>Select date</CardTitle>
-        <CardDescription>Click on the button below.</CardDescription>
+        <CardTitle>⏰ When did you wake up?</CardTitle>
+        <CardDescription>It helps us adjust your schedule</CardDescription>
         </CardHeader>
         <CardContent>
-        <form className='flex flex-col gap-2'>
-            <Label htmlFor="time">Select date</Label>
+        <form className='flex flex-col gap-2 items-center justify-center'>
+            <Label htmlFor="time">Select time</Label>
             
             <TimeInput 
                 defaultHour={time.getHours()} 

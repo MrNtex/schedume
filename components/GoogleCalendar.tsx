@@ -180,8 +180,8 @@ const GoogleCalendar = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Google Calendar Integration</CardTitle>
-        <CardDescription>Select a calendar to view its events.</CardDescription>
+        <CardTitle>👇 Google Calendar Integration</CardTitle>
+        <CardDescription>Select a calendar to import its events.</CardDescription>
       </CardHeader>
       <CardContent>
         {isSignedIn ? (
